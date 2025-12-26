@@ -1,17 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Post</title>
-  <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Post</title>
+<style>
+body { font-family:'Georgia', serif; background:linear-gradient(135deg,#667eea,#764ba2); color:#333; padding:50px; min-height:100vh; }
+.container { max-width:800px; margin:0 auto; background:white; padding:40px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.2); }
+h1 { font-size:2.5em; margin-bottom:20px; }
+p.date { color:#999; font-size:0.9em; margin-bottom:30px; }
+p.content { font-size:1.2em; line-height:1.8; }
+a { display:inline-block; margin-top:30px; text-decoration:none; color:#667eea; }
+</style>
 </head>
 <body>
+<div class="container">
+<h1 id="post-title">Loading...</h1>
+<p class="date" id="post-date"></p>
+<p class="content" id="post-content"></p>
+<a href="index.html">← Back to all posts</a>
+</div>
 
-  <main class="post-container">
-    <h1 id="post-title"></h1>
-    <div id="post-content"></div>
-  </main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://zqmgtnnwrceagkshfapq.supabase.co";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxbWd0bm53cmNlYWdrc2hmYXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3MDI2ODgsImV4cCI6MjA4Mjc4Njg4fQ.Ql5KP6nfOSRzz1Z2eyN6WTqDsfVwZ0e9GKIbePa9eZE";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  <script src="post.js"></script>
+// Get post ID from URL
+const params = new URLSearchParams(window.location.search);
+const postId = params.get('id');
+
+async function loadPost() {
+    if(!postId){
+        document.getElementById('post-title').textContent = "Post not found";
+        return;
+    }
+    const { data, error } = await sb.from('posts').select('*').eq('id', postId).single();
+    if(error){
+        console.error(error);
+        document.getElementById('post-title').textContent = "Error loading post";
+        return;
+    }
+    document.getElementById('post-title').textContent = data.title;
+    document.getElementById('post-date').textContent = new Date(data.created_at).toLocaleDateString();
+    document.getElementById('post-content').textContent = data.content;
+}
+
+loadPost();
+</script>
 </body>
 </html>
