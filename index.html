@@ -70,7 +70,7 @@ textarea{min-height:200px}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL="https://zqmgtnnwrceagkshfapq.supabase.co";
-const SUPABASE_KEY="YOUR_ANON_KEY";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxbWd0bm53cmNlYWdrc2hmYXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3MDI2ODgsImV4cCI6MjA4MjI3ODY4OH0.Ql5KP6nfOSRzz1Z2eyN6WTqDsfVwZ0e9GKIbePa9eZE";
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let isAdmin=false;
@@ -191,7 +191,7 @@ async function savePost(){
     const title=document.getElementById("post-title").value;
     const content=document.getElementById("post-content").value;
     if(!title||!content){ showMessage("Title and content required","error"); return; }
-    const { error }=await sb.from("posts").insert({type,title,content,created_at:new Date().toISOString()});
+    const { error}=await sb.from("posts").insert({type,title,content,created_at:new Date().toISOString()});
     if(error){ showMessage(error.message,"error"); return; }
     closeModal();
     showMessage("Post published!","success");
@@ -275,7 +275,6 @@ loadPosts();
 
 
 
-
   
        
           
@@ -286,6 +285,7 @@ loadPosts();
 
 
      
+
 
 
 
