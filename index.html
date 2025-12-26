@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,8 +6,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ryan's Poetic and Literary Insights</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Georgia', serif; background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:#333; line-height:1.6; min-height:100vh; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Georgia', serif; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:#333; line-height:1.6; min-height:100vh; }
 .container { max-width:1200px; margin:0 auto; padding:20px; }
 header { text-align:center; padding:60px 20px; color:white; }
 header h1 { font-size:3.5em; margin-bottom:10px; }
@@ -47,9 +48,9 @@ textarea { min-height:200px; }
 </header>
 
 <nav>
-<button class="nav-btn active" onclick="filterPosts('all')">All</button>
-<button class="nav-btn" onclick="filterPosts('article')">Articles</button>
-<button class="nav-btn" onclick="filterPosts('poem')">Poems</button>
+<button class="nav-btn active" onclick="filterPosts('all', event)">All</button>
+<button class="nav-btn" onclick="filterPosts('article', event)">Articles</button>
+<button class="nav-btn" onclick="filterPosts('poem', event)">Poems</button>
 </nav>
 
 <div id="posts-container" class="posts-grid">
@@ -71,15 +72,20 @@ textarea { min-height:200px; }
 const SUPABASE_URL = "https://zqmgtnnwrceagkshfapq.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxbWd0bm53cmNlYWdrc2hmYXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3MDI2ODgsImV4cCI6MjA4MjI3ODY4OH0.Ql5KP6nfOSRzz1Z2eyN6WTqDsfVwZ0e9GKIbePa9eZE";
 
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// FIX: Use window.supabase instead of just supabase
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let isAdmin = false;
 let allPosts = [];
 let currentFilter = "all";
 
 async function loadPosts() {
-    const { data, error } = await supabase.from("posts").select("*").order("created_at",{ascending:false});
-    if(error) { console.error(error); document.getElementById("posts-container").innerHTML="<div class='error'>Error loading posts.</div>"; return; }
+    const { data, error } = await sb.from("posts").select("*").order("created_at",{ascending:false});
+    if(error){ 
+        console.error(error); 
+        document.getElementById("posts-container").innerHTML="<div class='error'>Error loading posts. Make sure table exists in Supabase.</div>"; 
+        return; 
+    }
     allPosts = data || [];
     displayPosts();
 }
@@ -87,20 +93,24 @@ async function loadPosts() {
 function displayPosts() {
     const container = document.getElementById("posts-container");
     const posts = currentFilter==="all"?allPosts:allPosts.filter(p=>p.type===currentFilter);
-    if(posts.length===0) { container.innerHTML="<div>No posts yet.</div>"; return; }
+    if(posts.length===0){ 
+        container.innerHTML="<div style='color:white;text-align:center;padding:50px;'>No posts yet. "+(isAdmin?"Click + to add posts!":"Check back soon!")+"</div>"; 
+        return; 
+    }
     container.innerHTML = posts.map(p=>`
         <div class="post-card ${p.type==="poem"?"poem":""}">
             <h3>${p.title}</h3>
-            <p>${p.content.substring(0,150)}${p.content.length>150?"...":""}</p>
-            ${isAdmin?`<div class="btn-group">
-                <button class="btn btn-secondary" onclick="openEditPost('${p.id}')">Edit</button>
-                <button class="btn btn-danger" onclick="deletePost('${p.id}')">Delete</button>
+            <div style="color:#999;font-size:0.9em;margin:10px 0;">${new Date(p.created_at).toLocaleDateString()}</div>
+            <p style="color:#666;">${p.content.substring(0,150)}${p.content.length>150?"...":""}</p>
+            ${isAdmin?`<div class="btn-group" style="margin-top:15px;">
+                <button class="btn btn-secondary" onclick="event.stopPropagation();openEditPost('${p.id}')">Edit</button>
+                <button class="btn btn-danger" onclick="event.stopPropagation();deletePost('${p.id}')">Delete</button>
             </div>`:""}
         </div>
     `).join("");
 }
 
-function filterPosts(type){
+function filterPosts(type,event){
     currentFilter=type;
     document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
     event.target.classList.add("active");
@@ -108,15 +118,32 @@ function filterPosts(type){
 }
 
 function toggleAdmin(){
-    isAdmin?supabase.auth.signOut().then(()=>{isAdmin=false;document.querySelector(".admin-btn").textContent="Admin";document.getElementById("add-btn").style.display="none";}):showLogin();
+    if(isAdmin){
+        sb.auth.signOut().then(()=>{ 
+            isAdmin=false;
+            document.querySelector(".admin-btn").textContent="Admin";
+            document.getElementById("add-btn").style.display="none";
+            displayPosts();
+            showMessage("Logged out", "success");
+        });
+    } else showLogin();
 }
 
 function showLogin(){
     document.getElementById("modal-title").textContent="Admin Login";
     document.getElementById("modal-body").innerHTML=`
-        <input id="email" placeholder="Email"><br><br>
-        <input id="password" type="password" placeholder="Password"><br><br>
-        <button class="btn btn-primary" onclick="login()">Login</button>
+        <div class="form-group">
+            <label>Email</label>
+            <input id="email" type="email" placeholder="your-email@example.com">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input id="password" type="password" placeholder="Enter password">
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="login()">Login</button>
+            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        </div>
     `;
     document.getElementById("admin-modal").classList.add("active");
 }
@@ -124,77 +151,175 @@ function showLogin(){
 async function login(){
     const email=document.getElementById("email").value;
     const password=document.getElementById("password").value;
-    const { data, error } = await supabase.auth.signInWithPassword({email,password});
-    if(error){ alert(error.message); return; }
+    
+    if(!email || !password){
+        showMessage("Enter email and password", "error");
+        return;
+    }
+    
+    const { data, error } = await sb.auth.signInWithPassword({email,password});
+    if(error){ 
+        showMessage(error.message, "error");
+        return; 
+    }
     isAdmin=true;
     document.querySelector(".admin-btn").textContent="Logout";
     document.getElementById("add-btn").style.display="block";
     closeModal();
-    loadPosts();
+    displayPosts();
+    showMessage("Logged in successfully!", "success");
 }
 
 function openAddPost(){
-    document.getElementById("modal-title").textContent="New Post";
+    document.getElementById("modal-title").textContent="Create New Post";
     document.getElementById("modal-body").innerHTML=`
-        <select id="type"><option>article</option><option>poem</option></select>
-        <input id="title" placeholder="Title"><br><br>
-        <textarea id="content" placeholder="Content"></textarea><br>
-        <button class="btn btn-primary" onclick="savePost()">Publish</button>
+        <div class="form-group">
+            <label>Type</label>
+            <select id="post-type">
+                <option value="article">Article</option>
+                <option value="poem">Poem</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Title</label>
+            <input id="post-title" type="text" placeholder="Enter title...">
+        </div>
+        <div class="form-group">
+            <label>Content</label>
+            <textarea id="post-content" placeholder="Write your content here..."></textarea>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="savePost()">Publish</button>
+            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        </div>
     `;
     document.getElementById("admin-modal").classList.add("active");
 }
 
 async function savePost(){
-    await supabase.from("posts").insert({
-        type:type.value,
-        title:title.value,
-        content:content.value,
+    const type=document.getElementById("post-type").value;
+    const title=document.getElementById("post-title").value;
+    const content=document.getElementById("post-content").value;
+    
+    if(!title||!content){ 
+        showMessage("Title and content required", "error");
+        return; 
+    }
+    
+    const { error } = await sb.from("posts").insert({
+        type:type,
+        title:title,
+        content:content,
         created_at:new Date().toISOString()
     });
+    
+    if(error){
+        showMessage(error.message, "error");
+        return;
+    }
+    
     closeModal();
+    showMessage("Post published!", "success");
     loadPosts();
 }
 
 function openEditPost(id){
     const p = allPosts.find(x=>x.id===id);
+    if(!p) return;
+    
     document.getElementById("modal-title").textContent="Edit Post";
     document.getElementById("modal-body").innerHTML=`
-        <select id="type"><option ${p.type==="article"?"selected":""}>article</option><option ${p.type==="poem"?"selected":""}>poem</option></select>
-        <input id="title" value="${p.title}"><br><br>
-        <textarea id="content">${p.content}</textarea><br>
-        <button class="btn btn-primary" onclick="updatePost('${id}')">Update</button>
+        <div class="form-group">
+            <label>Type</label>
+            <select id="edit-type">
+                <option value="article" ${p.type==="article"?"selected":""}>Article</option>
+                <option value="poem" ${p.type==="poem"?"selected":""}>Poem</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Title</label>
+            <input id="edit-title" type="text" value="${p.title.replace(/"/g, '&quot;')}">
+        </div>
+        <div class="form-group">
+            <label>Content</label>
+            <textarea id="edit-content">${p.content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="updatePost('${id}')">Update</button>
+            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        </div>
     `;
     document.getElementById("admin-modal").classList.add("active");
 }
 
 async function updatePost(id){
-    await supabase.from("posts").update({
-        type:type.value,
-        title:title.value,
-        content:content.value
+    const type=document.getElementById("edit-type").value;
+    const title=document.getElementById("edit-title").value;
+    const content=document.getElementById("edit-content").value;
+    
+    if(!title||!content){ 
+        showMessage("Title and content required", "error");
+        return; 
+    }
+    
+    const { error } = await sb.from("posts").update({
+        type:type,
+        title:title,
+        content:content
     }).eq("id",id);
+    
+    if(error){
+        showMessage(error.message, "error");
+        return;
+    }
+    
     closeModal();
+    showMessage("Post updated!", "success");
     loadPosts();
 }
 
 async function deletePost(id){
-    if(confirm("Delete post?")){ await supabase.from("posts").delete().eq("id",id); loadPosts(); }
+    if(!confirm("Delete this post?")) return;
+    
+    const { error } = await sb.from("posts").delete().eq("id",id);
+    
+    if(error){
+        showMessage(error.message, "error");
+        return;
+    }
+    
+    showMessage("Post deleted", "success");
+    loadPosts();
 }
 
-function closeModal(){
-    document.getElementById("admin-modal").classList.remove("active");
+function closeModal(){ 
+    document.getElementById("admin-modal").classList.remove("active"); 
 }
 
-/* CLOSE MODAL CLICK OUTSIDE */
-document.getElementById("admin-modal").addEventListener("click",function(e){if(e.target===this) closeModal();});
+function showMessage(text, type){
+    const msg = document.createElement("div");
+    msg.className = type;
+    msg.textContent = text;
+    msg.style.position = "fixed";
+    msg.style.top = "20px";
+    msg.style.left = "50%";
+    msg.style.transform = "translateX(-50%)";
+    msg.style.padding = "15px 30px";
+    msg.style.borderRadius = "8px";
+    msg.style.color = "white";
+    msg.style.zIndex = "3000";
+    document.body.appendChild(msg);
+    setTimeout(() => msg.remove(), 3000);
+}
 
-/* INITIAL LOAD */
+document.getElementById("admin-modal").addEventListener("click",function(e){ 
+    if(e.target===this) closeModal(); 
+});
+
 loadPosts();
 </script>
 </body>
 </html>
-
-
 
 
 
@@ -209,6 +334,7 @@ loadPosts();
 
 
      
+
 
 
 
