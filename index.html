@@ -255,12 +255,24 @@ function displayPosts() {
     }
     
     container.innerHTML = filtered.map(post => `
-        <article class="post-card ${escapeHtml(post.type)}" onclick="${isAdmin ? `openEditPost(${post.id})` : `window.location.href='post.html?id=${post.id}'`}">
+        <article class="post-card ${escapeHtml(post.type)}" data-post-id="${post.id}">
             <h3>${escapeHtml(post.title)}</h3>
             <p class="post-date">${formatDate(post.created_at)}</p>
             <p class="post-excerpt">${escapeHtml(post.content.substring(0, 150))}${post.content.length > 150 ? '...' : ''}</p>
         </article>
     `).join('');
+    
+    // Add click handlers after rendering
+    document.querySelectorAll('.post-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            if (isAdmin) {
+                openEditPost(postId);
+            } else {
+                window.location.href = `post.html?id=${postId}`;
+            }
+        });
+    });
 }
 
 function filterPosts(type, event) {
@@ -373,7 +385,7 @@ async function savePost() {
 function openEditPost(id) {
     if (!isAdmin) return;
     
-    const post = allPosts.find(p => p.id === id);
+    const post = allPosts.find(p => p.id == id);
     if (!post) return;
     
     const modal = document.getElementById('admin-modal');
