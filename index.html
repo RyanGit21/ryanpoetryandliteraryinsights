@@ -251,7 +251,7 @@ textarea{min-height:200px;resize:vertical}
 
 <button id="add-btn" class="add-post-btn" onclick="openAddPost()" aria-label="Add new post">+</button>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async defer></script>
 <script>
 const SUPABASE_URL="https://zqmgtnnwrceagkshfapq.supabase.co";
 const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxbWd0bm53cmNlYWdrc2hmYXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3MDI2ODgsImV4cCI6MjA4MjI3ODY4OH0.Ql5KP6nfOSRzz1Z2eyN6WTqDsfVwZ0e9GKIbePa9eZE";
@@ -540,7 +540,7 @@ function displayPosts(){
         document.querySelectorAll('.post-card').forEach(card=>{
             card.addEventListener('click',function(e){
                 e.preventDefault();
-                const postId=parseInt(this.getAttribute('data-post-id'));
+                const postId=String(this.getAttribute('data-post-id'));
                 openEditPost(postId);
             });
         });
@@ -701,15 +701,13 @@ async function savePost(){
 function openEditPost(id){
     if(!isAdmin)return;
     
-    const post=allPosts.find(p=>parseInt(p.id)===parseInt(id));
+    const post=allPosts.find(p=>String(p.id)===String(id));
     if(!post){
         showMessage('Post not found','error');
         return;
     }
     
     const modal=document.getElementById('admin-modal');
-    const escapedTitle=escapeHtml(post.title).replace(/'/g,'&#39;').replace(/"/g,'&quot;');
-    const escapedContent=escapeHtml(post.content).replace(/'/g,'&#39;').replace(/"/g,'&quot;');
     
     document.getElementById('modal-title').textContent='Edit Post';
     document.getElementById('modal-body').innerHTML=`
@@ -729,8 +727,8 @@ function openEditPost(id){
             <textarea id="edit-content"></textarea>
         </div>
         <div class="btn-group">
-            <button class="btn btn-primary" onclick="updatePost(${id})">Update</button>
-            <button class="btn btn-danger" onclick="deletePost(${id})">Delete</button>
+            <button class="btn btn-primary" onclick="updatePost('${post.id}')">Update</button>
+            <button class="btn btn-danger" onclick="deletePost('${post.id}')">Delete</button>
             <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
         </div>
     `;
@@ -751,7 +749,7 @@ window.updatePost=async function(id){
     }
     
     try{
-        const{error}=await sb.from('posts').update({title,type,content}).eq('id',id);
+        const{error}=await sb.from('posts').update({title,type,content}).eq('id',String(id));
         if(error)throw error;
         
         closeModal();
@@ -767,7 +765,7 @@ window.deletePost=async function(id){
     if(!confirm('Are you sure you want to delete this post?'))return;
     
     try{
-        const{error}=await sb.from('posts').delete().eq('id',id);
+        const{error}=await sb.from('posts').delete().eq('id',String(id));
         if(error)throw error;
         
         closeModal();
