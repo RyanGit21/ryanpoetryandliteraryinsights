@@ -1,15 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-DYGKTNNN1P"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-DYGKTNNN1P');
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ryan's Poetic and Literary Insights - Poetry, Stories & Articles</title>
@@ -21,71 +12,24 @@
 <meta property="og:description" content="A collection of poetry, stories, and literary articles">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ryangit21.github.io/ryanpoetryandliteraryinsights/">
+
 <style>
+/* Your existing CSS */
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Georgia',serif;background:linear-gradient(135deg,#667eea,#764ba2);color:#333;line-height:1.6;min-height:100vh}
-.container{max-width:1200px;margin:0 auto;padding:20px}
-header{text-align:center;padding:60px 20px;color:white}
-header h1{font-size:3.5em;margin-bottom:10px;text-shadow:2px 2px 4px rgba(0,0,0,0.3)}
-header p{font-size:1.3em;opacity:0.9}
-nav{display:flex;justify-content:center;gap:20px;margin:30px 0;flex-wrap:wrap}
-.nav-btn{padding:12px 30px;background:rgba(255,255,255,0.2);border:2px solid white;color:white;cursor:pointer;border-radius:30px;transition:all 0.3s ease;font-size:1em}
-.nav-btn:hover{background:rgba(255,255,255,0.3);transform:translateY(-2px)}
-.nav-btn.active{background:white;color:#667eea;font-weight:bold}
-.posts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:30px;margin-bottom:60px}
-.post-card{background:white;border-radius:15px;padding:30px;box-shadow:0 10px 30px rgba(0,0,0,0.2);cursor:pointer;transition:transform 0.3s ease,box-shadow 0.3s ease}
-.post-card:hover{transform:translateY(-5px);box-shadow:0 15px 40px rgba(0,0,0,0.3)}
-.post-card h3{color:#667eea;margin-bottom:10px;font-size:1.5em}
-.post-card.poem{font-style:italic;background:linear-gradient(135deg,#ffecd2,#fcb69f);border-left:5px solid #ff6b6b}
-.post-card.article{border-left:5px solid #667eea}
-.post-date{color:#999;font-size:0.9em;margin:10px 0;font-weight:normal}
-.post-excerpt{color:#666;line-height:1.8;margin-top:15px}
-.loading-container{color:white;text-align:center;padding:80px 20px;font-size:1.2em}
-.spinner{border:4px solid rgba(255,255,255,0.3);border-radius:50%;border-top:4px solid white;width:50px;height:50px;animation:spin 1s linear infinite;margin:20px auto}
-@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-.empty-state{color:white;text-align:center;padding:80px 20px;font-size:1.2em;background:rgba(255,255,255,0.1);border-radius:15px;margin:20px 0}
-.empty-state h3{font-size:1.8em;margin-bottom:15px}
-footer{background:rgba(0,0,0,0.3);color:white;text-align:center;padding:30px 20px;margin-top:60px}
-footer p{margin:5px 0;opacity:0.9}
-footer a{color:white;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.5);transition:opacity 0.3s}
-footer a:hover{opacity:0.7}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:2000;justify-content:center;align-items:center;padding:20px}
-.modal.active{display:flex}
-.modal-content{background:white;padding:40px;border-radius:20px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto}
-.modal-content h2{color:#667eea;margin-bottom:25px;font-size:2em}
-.form-group{margin-bottom:20px}
-.form-group label{font-weight:bold;display:block;margin-bottom:8px;color:#667eea}
-.form-group input,textarea,select{width:100%;padding:12px;border-radius:8px;border:2px solid #ddd;font-family:inherit;font-size:1em;transition:border-color 0.3s}
-.form-group input:focus,textarea:focus,select:focus{outline:none;border-color:#667eea}
-textarea{min-height:200px;resize:vertical}
-.btn-group{display:flex;gap:15px;margin-top:20px;flex-wrap:wrap}
-.btn{padding:15px 30px;border-radius:8px;cursor:pointer;border:none;font-size:1em;transition:all 0.3s ease;font-weight:bold}
-.btn:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(0,0,0,0.2)}
-.btn-primary{background:#667eea;color:white}
-.btn-primary:hover{background:#5568d3}
-.btn-secondary{background:#ddd;color:#333}
-.btn-secondary:hover{background:#ccc}
-.btn-danger{background:#e74c3c;color:white}
-.btn-danger:hover{background:#c0392b}
-.admin-btn{position:fixed;top:20px;right:20px;padding:10px 20px;background:rgba(255,255,255,0.2);border:2px solid white;color:white;cursor:pointer;border-radius:25px;z-index:100;transition:all 0.3s ease;font-weight:bold}
-.admin-btn:hover{background:rgba(255,255,255,0.3)}
-.add-post-btn{position:fixed;bottom:40px;right:40px;width:60px;height:60px;background:#667eea;color:white;border-radius:50%;font-size:2em;border:none;cursor:pointer;display:none;z-index:1000;box-shadow:0 5px 20px rgba(0,0,0,0.3);transition:all 0.3s ease}
-.add-post-btn:hover{transform:scale(1.1);background:#5568d3}
-.success,.error{position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:15px 30px;border-radius:8px;color:white;z-index:3000;font-weight:bold;box-shadow:0 5px 20px rgba(0,0,0,0.3);animation:slideDown 0.3s ease}
-.success{background:#2ecc71}
-.error{background:#e74c3c}
-@keyframes slideDown{from{top:-100px;opacity:0}to{top:20px;opacity:1}}
-@media(max-width:768px){
-    header h1{font-size:2.5em}
-    header p{font-size:1.1em}
-    .posts-grid{grid-template-columns:1fr;gap:20px}
-    .post-card{padding:20px}
-    .modal-content{padding:25px}
-    nav{gap:10px}
-    .nav-btn{padding:10px 20px;font-size:0.9em}
-    .add-post-btn{bottom:20px;right:20px;width:50px;height:50px;font-size:1.5em}
-}
+/* ... rest of your CSS ... */
 </style>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DYGKTNNN1P"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-DYGKTNNN1P');
+</script>
+
 </head>
 <body>
 <button class="admin-btn" onclick="toggleAdmin()">Admin</button>
@@ -130,164 +74,7 @@ textarea{min-height:200px;resize:vertical}
 const SUPABASE_URL="https://zqmgtnnwrceagkshfapq.supabase.co";
 const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxbWd0bm53cmNlYWdrc2hmYXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3MDI2ODgsImV4cCI6MjA4MjI3ODY4OH0.Ql5KP6nfOSRzz1Z2eyN6WTqDsfVwZ0e9GKIbePa9eZE";
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let isAdmin=false;
-let allPosts=[];
-let currentFilter="all";
-
-async function loadPosts(){
-    const {data,error}=await sb.from("posts").select("*").order("created_at",{ascending:false});
-    if(error){
-        console.error(error);
-        document.getElementById("posts-container").innerHTML="<div class='error' style='position:static;transform:none;'>Error loading posts. Please refresh the page.</div>";
-        return;
-    }
-    allPosts=data||[];
-    displayPosts();
-}
-
-function escapeHtml(text){
-    const div=document.createElement('div');
-    div.textContent=text;
-    return div.innerHTML;
-}
-
-function formatDate(dateString){
-    const date=new Date(dateString);
-    const options={year:'numeric',month:'long',day:'numeric'};
-    return date.toLocaleDateString('en-US',options);
-}
-
-function displayPosts(){
-    const container=document.getElementById("posts-container");
-    const posts=currentFilter==="all"?allPosts:allPosts.filter(p=>p.type===currentFilter);
-    
-    if(posts.length===0){
-        container.innerHTML='<div class="empty-state"><h3>No '+(currentFilter==="all"?"posts":currentFilter+"s")+' yet</h3><p style="margin-top:10px;">'+(isAdmin?"Click the + button below to create your first post!":"Check back soon for new content!")+'</p></div>';
-        return;
-    }
-    
-    const postsHtml=posts.map(p=>{
-        const title=escapeHtml(p.title);
-        const date=formatDate(p.created_at);
-        const excerpt=escapeHtml(p.content.substring(0,150))+(p.content.length>150?"...":"");
-        const adminButtons=isAdmin?'<div class="btn-group" style="margin-top:15px;" onclick="event.stopPropagation()"><button class="btn btn-secondary" onclick="openEditPost(\''+p.id+'\')">Edit</button><button class="btn btn-danger" onclick="deletePost(\''+p.id+'\')">Delete</button></div>':"";
-        
-        return '<article class="post-card '+p.type+'" onclick="window.location.href=\'post.html?id='+p.id+'\'" role="article"><h3>'+title+'</h3><time class="post-date" datetime="'+p.created_at+'">'+date+'</time><p class="post-excerpt">'+excerpt+'</p>'+adminButtons+'</article>';
-    }).join("");
-    
-    container.innerHTML=postsHtml;
-}
-
-function filterPosts(type,event){
-    currentFilter=type;
-    document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
-    event.target.classList.add("active");
-    displayPosts();
-}
-
-function toggleAdmin(){
-    if(isAdmin){
-        sb.auth.signOut().then(()=>{
-            isAdmin=false;
-            document.querySelector(".admin-btn").textContent="Admin";
-            document.getElementById("add-btn").style.display="none";
-            displayPosts();
-            showMessage("Logged out","success");
-        });
-    } else showLogin();
-}
-
-function showLogin(){
-    document.getElementById("modal-title").textContent="Admin Login";
-    document.getElementById("modal-body").innerHTML='<div class="form-group"><label>Email</label><input id="email" type="email" placeholder="admin@example.com" autocomplete="email"></div><div class="form-group"><label>Password</label><input id="password" type="password" placeholder="Enter password" autocomplete="current-password"></div><div class="btn-group"><button class="btn btn-primary" onclick="login()">Login</button><button class="btn btn-secondary" onclick="closeModal()">Cancel</button></div>';
-    document.getElementById("admin-modal").classList.add("active");
-    setTimeout(()=>document.getElementById("email").focus(),100);
-}
-
-async function login(){
-    const email=document.getElementById("email").value;
-    const password=document.getElementById("password").value;
-    if(!email||!password){ showMessage("Enter email and password","error"); return; }
-    const { data,error }=await sb.auth.signInWithPassword({email,password});
-    if(error){ showMessage(error.message,"error"); return; }
-    isAdmin=true;
-    document.querySelector(".admin-btn").textContent="Logout";
-    document.getElementById("add-btn").style.display="block";
-    closeModal();
-    displayPosts();
-    showMessage("Logged in successfully!","success");
-}
-
-function openAddPost(){
-    document.getElementById("modal-title").textContent="Create New Post";
-    document.getElementById("modal-body").innerHTML='<div class="form-group"><label>Type</label><select id="post-type"><option value="article">Article</option><option value="poem">Poem</option></select></div><div class="form-group"><label>Title</label><input id="post-title" type="text" placeholder="Enter title..."></div><div class="form-group"><label>Content</label><textarea id="post-content" placeholder="Write your content here..."></textarea></div><div class="btn-group"><button class="btn btn-primary" onclick="savePost()">Publish</button><button class="btn btn-secondary" onclick="closeModal()">Cancel</button></div>';
-    document.getElementById("admin-modal").classList.add("active");
-    setTimeout(()=>document.getElementById("post-title").focus(),100);
-}
-
-async function savePost(){
-    const type=document.getElementById("post-type").value;
-    const title=document.getElementById("post-title").value;
-    const content=document.getElementById("post-content").value;
-    if(!title||!content){ showMessage("Title and content required","error"); return; }
-    const { error}=await sb.from("posts").insert({type,title,content,created_at:new Date().toISOString()});
-    if(error){ showMessage(error.message,"error"); return; }
-    closeModal();
-    showMessage("Post published!","success");
-    loadPosts();
-}
-
-function openEditPost(id){
-    const p=allPosts.find(x=>x.id===id);
-    if(!p) return;
-    const titleVal=escapeHtml(p.title).replace(/'/g,"&#39;");
-    const contentVal=escapeHtml(p.content).replace(/'/g,"&#39;");
-    document.getElementById("modal-title").textContent="Edit Post";
-    document.getElementById("modal-body").innerHTML='<div class="form-group"><label>Type</label><select id="edit-type"><option value="article" '+(p.type==="article"?"selected":"")+'>Article</option><option value="poem" '+(p.type==="poem"?"selected":"")+'>Poem</option></select></div><div class="form-group"><label>Title</label><input id="edit-title" type="text" value="'+titleVal+'"></div><div class="form-group"><label>Content</label><textarea id="edit-content">'+contentVal+'</textarea></div><div class="btn-group"><button class="btn btn-primary" onclick="updatePost(\''+id+'\')">Update</button><button class="btn btn-secondary" onclick="closeModal()">Cancel</button></div>';
-    document.getElementById("admin-modal").classList.add("active");
-}
-
-async function updatePost(id){
-    const type=document.getElementById("edit-type").value;
-    const title=document.getElementById("edit-title").value;
-    const content=document.getElementById("edit-content").value;
-    if(!title||!content){ showMessage("Title and content required","error"); return; }
-    const { error}=await sb.from("posts").update({type,title,content}).eq("id",id);
-    if(error){ showMessage(error.message,"error"); return; }
-    closeModal();
-    showMessage("Post updated!","success");
-    loadPosts();
-}
-
-async function deletePost(id){
-    if(!confirm("Delete this post? This action cannot be undone.")) return;
-    const { error}=await sb.from("posts").delete().eq("id",id);
-    if(error){ showMessage(error.message,"error"); return; }
-    showMessage("Post deleted","success");
-    loadPosts();
-}
-
-function closeModal(){
-    document.getElementById("admin-modal").classList.remove("active");
-    document.getElementById("about-modal").classList.remove("active");
-}
-
-function showMessage(text,type){
-    const msg=document.createElement("div");
-    msg.className=type;
-    msg.textContent=text;
-    document.body.appendChild(msg);
-    setTimeout(()=>msg.remove(),3000);
-}
-
-document.getElementById("admin-modal").addEventListener("click",function(e){
-    if(e.target===this) closeModal();
-});
-
-document.addEventListener("keydown",function(e){
-    if(e.key==="Escape") closeModal();
-});
-
+/* ... rest of your JS ... */
 loadPosts();
 </script>
 </body>
