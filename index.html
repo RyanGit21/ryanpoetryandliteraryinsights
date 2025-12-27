@@ -3,6 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DYGKTNNN1P"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-DYGKTNNN1P');
+</script>
+
 <title>Ryan's Poetic and Literary Insights - Poetry, Stories & Articles</title>
 <meta name="description" content="Explore Ryan's collection of poetry, literary articles, and creative writing. Discover thought-provoking stories and beautiful poems about life, art, and culture.">
 <meta name="keywords" content="poetry, literature, creative writing, articles, poems, Ryan's blog, literary insights">
@@ -146,12 +157,10 @@ function getCachedPosts() {
         const {data, timestamp} = JSON.parse(cached);
         const now = Date.now();
         
-        // Check if cache is still valid
         if (now - timestamp < CACHE_DURATION) {
             return data;
         }
         
-        // Cache expired
         localStorage.removeItem(CACHE_KEY);
         return null;
     } catch (e) {
@@ -171,30 +180,25 @@ function setCachedPosts(posts) {
     }
 }
 
-// Initialize Supabase when library loads
 function initSupabase() {
     if (window.supabase) {
         sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         loadPosts();
     } else {
-        // Retry if library not loaded yet
         setTimeout(initSupabase, 100);
     }
 }
 
 async function loadPosts() {
     try {
-        // Try to load from cache first
         const cachedPosts = getCachedPosts();
         if (cachedPosts) {
             allPosts = cachedPosts;
             displayPosts();
-            // Still fetch fresh data in background
             fetchPostsInBackground();
             return;
         }
         
-        // No cache, show loading and fetch
         const {data, error} = await Promise.race([
             sb.from('posts').select('id,title,type,content,created_at').order('created_at', {ascending: false}),
             new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000))
@@ -208,7 +212,6 @@ async function loadPosts() {
     } catch (err) {
         console.error('Error loading posts:', err);
         
-        // Try to show cached data even if expired
         const cachedPosts = getCachedPosts();
         if (cachedPosts) {
             allPosts = cachedPosts;
@@ -230,7 +233,7 @@ async function fetchPostsInBackground() {
             displayPosts();
         }
     } catch (e) {
-        // Silently fail - user already has cached data
+        // Silently fail
     }
 }
 
@@ -245,6 +248,7 @@ function formatDate(dateString) {
     return date.toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});
 }
 
+// SIMPLIFIED VERSION - Direct links with <a> tags
 function displayPosts() {
     const container = document.getElementById('posts-container');
     const filtered = currentFilter === 'all' ? allPosts : allPosts.filter(p => p.type === currentFilter);
@@ -254,25 +258,35 @@ function displayPosts() {
         return;
     }
     
-    container.innerHTML = filtered.map(post => `
-        <article class="post-card ${escapeHtml(post.type)}" data-post-id="${post.id}">
-            <h3>${escapeHtml(post.title)}</h3>
-            <p class="post-date">${formatDate(post.created_at)}</p>
-            <p class="post-excerpt">${escapeHtml(post.content.substring(0, 150))}${post.content.length > 150 ? '...' : ''}</p>
-        </article>
-    `).join('');
-    
-    // Add click handlers after rendering
-    document.querySelectorAll('.post-card').forEach(card => {
-        card.addEventListener('click', function() {
-            const postId = this.getAttribute('data-post-id');
-            if (isAdmin) {
+    // If admin, show cards with click handlers. If not admin, wrap in <a> tags
+    if (isAdmin) {
+        container.innerHTML = filtered.map(post => `
+            <article class="post-card ${escapeHtml(post.type)}" data-post-id="${post.id}" style="text-decoration:none;color:inherit;">
+                <h3>${escapeHtml(post.title)}</h3>
+                <p class="post-date">${formatDate(post.created_at)}</p>
+                <p class="post-excerpt">${escapeHtml(post.content.substring(0, 150))}${post.content.length > 150 ? '...' : ''}</p>
+            </article>
+        `).join('');
+        
+        // Add click handlers for admin
+        document.querySelectorAll('.post-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const postId = this.getAttribute('data-post-id');
                 openEditPost(postId);
-            } else {
-                window.location.href = `post.html?id=${postId}`;
-            }
+            });
         });
-    });
+    } else {
+        // For regular users, use actual links
+        container.innerHTML = filtered.map(post => `
+            <a href="post.html?id=${post.id}" style="text-decoration:none;color:inherit;">
+                <article class="post-card ${escapeHtml(post.type)}">
+                    <h3>${escapeHtml(post.title)}</h3>
+                    <p class="post-date">${formatDate(post.created_at)}</p>
+                    <p class="post-excerpt">${escapeHtml(post.content.substring(0, 150))}${post.content.length > 150 ? '...' : ''}</p>
+                </article>
+            </a>
+        `).join('');
+    }
 }
 
 function filterPosts(type, event) {
@@ -375,7 +389,7 @@ async function savePost() {
         
         closeModal();
         showMessage('Post added successfully!', 'success');
-        localStorage.removeItem(CACHE_KEY); // Clear cache
+        localStorage.removeItem(CACHE_KEY);
         await loadPosts();
     } catch (err) {
         showMessage('Error saving post: ' + err.message, 'error');
@@ -431,7 +445,7 @@ async function updatePost(id) {
         
         closeModal();
         showMessage('Post updated successfully!', 'success');
-        localStorage.removeItem(CACHE_KEY); // Clear cache
+        localStorage.removeItem(CACHE_KEY);
         await loadPosts();
     } catch (err) {
         showMessage('Error updating post: ' + err.message, 'error');
@@ -447,7 +461,7 @@ async function deletePost(id) {
         
         closeModal();
         showMessage('Post deleted successfully!', 'success');
-        localStorage.removeItem(CACHE_KEY); // Clear cache
+        localStorage.removeItem(CACHE_KEY);
         await loadPosts();
     } catch (err) {
         showMessage('Error deleting post: ' + err.message, 'error');
@@ -475,7 +489,6 @@ document.addEventListener("keydown", function(e) {
     if (e.key === "Escape") closeModal();
 });
 
-// Start loading when Supabase is ready
 initSupabase();
 </script>
 </body>
