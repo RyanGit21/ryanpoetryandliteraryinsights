@@ -251,7 +251,7 @@ textarea{min-height:200px;resize:vertical}
 
 <button id="add-btn" class="add-post-btn" onclick="openAddPost()" aria-label="Add new post">+</button>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async defer></script>
 <script>
 const SUPABASE_URL="https://zqmgtnnwrceagkshfapq.supabase.co";
 const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxbWd0bm53cmNlYWdrc2hmYXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3MDI2ODgsImV4cCI6MjA4MjI3ODY4OH0.Ql5KP6nfOSRzz1Z2eyN6WTqDsfVwZ0e9GKIbePa9eZE";
@@ -327,7 +327,7 @@ async function loadPosts(){
         
         const{data,error}=await Promise.race([
             sb.from('posts').select('id,title,type,content,created_at').order('created_at',{ascending:false}),
-            new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout')),10000))
+            new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout')),8000))
         ]);
         
         if(error)throw error;
@@ -343,7 +343,7 @@ async function loadPosts(){
             allPosts=cachedPosts;
             displayPosts();
             injectStructuredData();
-            showMessage('Showing cached posts. Network connection slow.','error');
+            showMessage('Showing cached posts','error');
         }else{
             document.getElementById('posts-container').innerHTML=
                 '<div class="empty-state"><h3>Connection Error</h3><p>Unable to load posts. Please check your internet connection and try refreshing the page.</p></div>';
@@ -515,10 +515,9 @@ function displayPosts(){
         return;
     }
     
-    const startIndex=(currentPage-1)*POSTS
-_PER_PAGE;
+    const startIndex=(currentPage-1)*POSTS_PER_PAGE;
     const endIndex=startIndex+POSTS_PER_PAGE;
-    const postsToShow=filtered.slice(startIndex,endIndex);
+const postsToShow=filtered.slice(startIndex,endIndex);
     
     if(isAdmin){
         container.innerHTML=postsToShow.map(post=>{
