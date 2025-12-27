@@ -10,7 +10,6 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-DYGKTNNN1P');
 </script>
 
@@ -25,10 +24,10 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ryangit21.github.io/ryanpoetryandliteraryinsights/">
 
-<!-- Preconnect to Supabase for faster loading -->
 <link rel="preconnect" href="https://zqmgtnnwrceagkshfapq.supabase.co">
 <link rel="dns-prefetch" href="https://zqmgtnnwrceagkshfapq.supabase.co">
 
+<!-- Critical CSS only - above the fold content -->
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Georgia',serif;background:linear-gradient(135deg,#667eea,#764ba2);color:#333;line-height:1.6;min-height:100vh}
@@ -40,25 +39,29 @@ nav{display:flex;justify-content:center;gap:20px;margin:30px 0;flex-wrap:wrap}
 .nav-btn{padding:12px 30px;background:rgba(255,255,255,0.2);border:2px solid white;color:white;cursor:pointer;border-radius:30px;transition:all 0.3s ease;font-size:1em}
 .nav-btn:hover{background:rgba(255,255,255,0.3);transform:translateY(-2px)}
 .nav-btn.active{background:white;color:#667eea;font-weight:bold}
+.loading-container{color:white;text-align:center;padding:80px 20px;font-size:1.2em}
+.spinner{border:4px solid rgba(255,255,255,0.3);border-radius:50%;border-top:4px solid white;width:50px;height:50px;animation:spin 1s linear infinite;margin:20px auto}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+</style>
+
+<!-- Non-critical CSS loaded async -->
+<style>
 .posts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:30px;margin-bottom:60px}
-.post-card{background:white;border-radius:15px;padding:30px;box-shadow:0 10px 30px rgba(0,0,0,0.2);cursor:pointer;transition:transform 0.3s ease,box-shadow 0.3s ease}
+.post-card{background:white;border-radius:15px;padding:30px;box-shadow:0 10px 30px rgba(0,0,0,0.2);cursor:pointer;transition:transform 0.3s ease,box-shadow 0.3s ease;text-decoration:none;color:inherit;display:block}
 .post-card:hover{transform:translateY(-5px);box-shadow:0 15px 40px rgba(0,0,0,0.3)}
 .post-card h3{color:#667eea;margin-bottom:10px;font-size:1.5em}
 .post-card.poem{font-style:italic;background:linear-gradient(135deg,#ffecd2,#fcb69f);border-left:5px solid #ff6b6b}
 .post-card.article{border-left:5px solid #667eea}
 .post-date{color:#999;font-size:0.9em;margin:10px 0;font-weight:normal}
 .post-excerpt{color:#666;line-height:1.8;margin-top:15px}
-.loading-container{color:white;text-align:center;padding:80px 20px;font-size:1.2em}
-.spinner{border:4px solid rgba(255,255,255,0.3);border-radius:50%;border-top:4px solid white;width:50px;height:50px;animation:spin 1s linear infinite;margin:20px auto}
-@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 .empty-state{color:white;text-align:center;padding:80px 20px;font-size:1.2em;background:rgba(255,255,255,0.1);border-radius:15px;margin:20px 0}
 .empty-state h3{font-size:1.8em;margin-bottom:15px}
 footer{background:rgba(0,0,0,0.3);color:white;text-align:center;padding:30px 20px;margin-top:60px}
 footer p{margin:5px 0;opacity:0.9}
 footer a{color:white;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.5);transition:opacity 0.3s}
 footer a:hover{opacity:0.7}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:2000;justify-content:center;align-items:center;padding:20px}
-.modal.active{display:flex}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:2000;justify-content:center;align-items:center;padding:20px;opacity:0;transition:opacity 0.3s ease}
+.modal.active{display:flex;opacity:1}
 .modal-content{background:white;padding:40px;border-radius:20px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto}
 .modal-content h2{color:#667eea;margin-bottom:25px;font-size:2em}
 .form-group{margin-bottom:20px}
@@ -134,7 +137,6 @@ textarea{min-height:200px;resize:vertical}
 </div>
 <button id="add-btn" class="add-post-btn" onclick="openAddPost()" aria-label="Add new post">+</button>
 
-<!-- Load Supabase with async to not block rendering -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async></script>
 <script>
 const SUPABASE_URL="https://zqmgtnnwrceagkshfapq.supabase.co";
@@ -145,172 +147,170 @@ let isAdmin=false;
 let allPosts=[];
 let currentFilter="all";
 
-// Cache posts in localStorage for 5 minutes
-const CACHE_KEY = 'blog_posts_cache';
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_KEY='blog_posts_cache_v2';
+const CACHE_DURATION=30*60*1000;
 
-function getCachedPosts() {
-    try {
-        const cached = localStorage.getItem(CACHE_KEY);
-        if (!cached) return null;
-        
-        const {data, timestamp} = JSON.parse(cached);
-        const now = Date.now();
-        
-        if (now - timestamp < CACHE_DURATION) {
-            return data;
-        }
-        
+function getCachedPosts(){
+    try{
+        const cached=localStorage.getItem(CACHE_KEY);
+        if(!cached)return null;
+        const{data,timestamp}=JSON.parse(cached);
+        if(Date.now()-timestamp<CACHE_DURATION)return data;
         localStorage.removeItem(CACHE_KEY);
         return null;
-    } catch (e) {
-        return null;
-    }
+    }catch(e){return null}
 }
 
-function setCachedPosts(posts) {
-    try {
-        const cacheData = {
-            data: posts,
-            timestamp: Date.now()
-        };
-        localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-    } catch (e) {
-        // Ignore if localStorage is full
-    }
+function setCachedPosts(posts){
+    try{
+        localStorage.setItem(CACHE_KEY,JSON.stringify({data:posts,timestamp:Date.now()}));
+    }catch(e){}
 }
 
-function initSupabase() {
-    if (window.supabase) {
-        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+function initSupabase(){
+    if(window.supabase){
+        sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
         loadPosts();
-    } else {
-        setTimeout(initSupabase, 100);
+    }else{
+        setTimeout(initSupabase,100);
     }
 }
 
-async function loadPosts() {
-    try {
-        const cachedPosts = getCachedPosts();
-        if (cachedPosts) {
-            allPosts = cachedPosts;
+async function loadPosts(){
+    try{
+        const cachedPosts=getCachedPosts();
+        if(cachedPosts){
+            allPosts=cachedPosts;
             displayPosts();
             fetchPostsInBackground();
             return;
         }
         
-        const {data, error} = await Promise.race([
-            sb.from('posts').select('id,title,type,content,created_at').order('created_at', {ascending: false}),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000))
+        const{data,error}=await Promise.race([
+            sb.from('posts').select('id,title,type,content,created_at').order('created_at',{ascending:false}),
+            new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout')),10000))
         ]);
         
-        if (error) throw error;
+        if(error)throw error;
         
-        allPosts = data || [];
+        allPosts=data||[];
         setCachedPosts(allPosts);
         displayPosts();
-    } catch (err) {
-        console.error('Error loading posts:', err);
-        
-        const cachedPosts = getCachedPosts();
-        if (cachedPosts) {
-            allPosts = cachedPosts;
+    }catch(err){
+        console.error('Error loading posts:',err);
+        const cachedPosts=getCachedPosts();
+        if(cachedPosts){
+            allPosts=cachedPosts;
             displayPosts();
-            showMessage('Showing cached posts. Network connection slow.', 'error');
-        } else {
-            document.getElementById('posts-container').innerHTML = 
+            showMessage('Showing cached posts. Network connection slow.','error');
+        }else{
+            document.getElementById('posts-container').innerHTML=
                 '<div class="empty-state"><h3>Connection Error</h3><p>Unable to load posts. Please check your internet connection and try refreshing the page.</p></div>';
         }
     }
 }
 
-async function fetchPostsInBackground() {
-    try {
-        const {data, error} = await sb.from('posts').select('id,title,type,content,created_at').order('created_at', {ascending: false});
-        if (!error && data) {
-            allPosts = data;
+async function fetchPostsInBackground(){
+    try{
+        const{data,error}=await sb.from('posts').select('id,title,type,content,created_at').order('created_at',{ascending:false});
+        if(!error&&data){
+            allPosts=data;
             setCachedPosts(allPosts);
             displayPosts();
         }
-    } catch (e) {
-        // Silently fail
-    }
+    }catch(e){}
 }
 
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
+function escapeHtml(text){
+    const div=document.createElement('div');
+    div.textContent=text;
     return div.innerHTML;
 }
 
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});
+function formatDate(dateString){
+    return new Date(dateString).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
 }
 
-// SIMPLIFIED VERSION - Direct links with <a> tags
-function displayPosts() {
-    const container = document.getElementById('posts-container');
-    const filtered = currentFilter === 'all' ? allPosts : allPosts.filter(p => p.type === currentFilter);
+function displayPosts(){
+    const container=document.getElementById('posts-container');
+    const filtered=currentFilter==='all'?allPosts:allPosts.filter(p=>p.type===currentFilter);
     
-    if (filtered.length === 0) {
-        container.innerHTML = '<div class="empty-state"><h3>No posts yet</h3><p>Check back soon for new content!</p></div>';
+    if(filtered.length===0){
+        container.innerHTML='<div class="empty-state"><h3>No posts yet</h3><p>Check back soon for new content!</p></div>';
         return;
     }
     
-    // If admin, show cards with click handlers. If not admin, wrap in <a> tags
-    if (isAdmin) {
-        container.innerHTML = filtered.map(post => `
-            <article class="post-card ${escapeHtml(post.type)}" data-post-id="${post.id}" style="text-decoration:none;color:inherit;">
+    if(isAdmin){
+        container.innerHTML=filtered.map(post=>`
+            <article class="post-card ${escapeHtml(post.type)}" data-post-id="${post.id}" style="cursor:pointer;">
                 <h3>${escapeHtml(post.title)}</h3>
                 <p class="post-date">${formatDate(post.created_at)}</p>
-                <p class="post-excerpt">${escapeHtml(post.content.substring(0, 150))}${post.content.length > 150 ? '...' : ''}</p>
+                <p class="post-excerpt">${escapeHtml(post.content.substring(0,150))}${post.content.length>150?'...':''}</p>
             </article>
         `).join('');
         
-        // Add click handlers for admin
-        document.querySelectorAll('.post-card').forEach(card => {
-            card.addEventListener('click', function() {
-                const postId = this.getAttribute('data-post-id');
-                openEditPost(postId);
+        document.querySelectorAll('.post-card').forEach(card=>{
+            card.addEventListener('click',function(){
+                openEditPost(this.getAttribute('data-post-id'));
             });
         });
-    } else {
-        // For regular users, use actual links
-        container.innerHTML = filtered.map(post => `
-            <a href="post.html?id=${post.id}" style="text-decoration:none;color:inherit;">
-                <article class="post-card ${escapeHtml(post.type)}">
-                    <h3>${escapeHtml(post.title)}</h3>
-                    <p class="post-date">${formatDate(post.created_at)}</p>
-                    <p class="post-excerpt">${escapeHtml(post.content.substring(0, 150))}${post.content.length > 150 ? '...' : ''}</p>
-                </article>
+    }else{
+        container.innerHTML=filtered.map(post=>`
+            <a href="post.html?id=${post.id}" class="post-card ${escapeHtml(post.type)}">
+                <h3>${escapeHtml(post.title)}</h3>
+                <p class="post-date">${formatDate(post.created_at)}</p>
+                <p class="post-excerpt">${escapeHtml(post.content.substring(0,150))}${post.content.length>150?'...':''}</p>
             </a>
         `).join('');
+        
+        // Prefetch on hover for instant navigation
+        document.querySelectorAll('a[href^="post.html"]').forEach(link=>{
+            link.addEventListener('mouseenter',function(){
+                const postId=new URL(this.href).searchParams.get('id');
+                prefetchPost(postId);
+            },{once:true});
+        });
     }
 }
 
-function filterPosts(type, event) {
-    currentFilter = type;
-    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+function prefetchPost(id){
+    const CACHE_PREFIX='post_';
+    try{
+        const cached=localStorage.getItem(CACHE_PREFIX+id);
+        if(cached)return;
+    }catch(e){}
+    
+    sb.from("posts").select("*").eq("id",id).single().then(({data})=>{
+        if(data){
+            try{
+                localStorage.setItem(CACHE_PREFIX+id,JSON.stringify({data:data,timestamp:Date.now()}));
+            }catch(e){}
+        }
+    });
+}
+
+function filterPosts(type,event){
+    currentFilter=type;
+    document.querySelectorAll('.nav-btn').forEach(btn=>btn.classList.remove('active'));
     event.target.classList.add('active');
     displayPosts();
 }
 
-function toggleAdmin() {
-    if (isAdmin) {
-        isAdmin = false;
-        document.getElementById('add-btn').style.display = 'none';
-        document.querySelector('.admin-btn').textContent = 'Admin';
+function toggleAdmin(){
+    if(isAdmin){
+        isAdmin=false;
+        document.getElementById('add-btn').style.display='none';
+        document.querySelector('.admin-btn').textContent='Admin';
         displayPosts();
-    } else {
+    }else{
         showLogin();
     }
 }
 
-function showLogin() {
-    const modal = document.getElementById('admin-modal');
-    document.getElementById('modal-title').textContent = 'Admin Login';
-    document.getElementById('modal-body').innerHTML = `
+function showLogin(){
+    const modal=document.getElementById('admin-modal');
+    document.getElementById('modal-title').textContent='Admin Login';
+    document.getElementById('modal-body').innerHTML=`
         <div class="form-group">
             <label>Email:</label>
             <input type="email" id="admin-email" placeholder="admin@example.com">
@@ -327,29 +327,29 @@ function showLogin() {
     modal.classList.add('active');
 }
 
-async function login() {
-    const email = document.getElementById('admin-email').value;
-    const password = document.getElementById('admin-password').value;
+async function login(){
+    const email=document.getElementById('admin-email').value;
+    const password=document.getElementById('admin-password').value;
     
-    try {
-        const {data, error} = await sb.auth.signInWithPassword({email, password});
-        if (error) throw error;
+    try{
+        const{data,error}=await sb.auth.signInWithPassword({email,password});
+        if(error)throw error;
         
-        isAdmin = true;
-        document.getElementById('add-btn').style.display = 'block';
-        document.querySelector('.admin-btn').textContent = 'Logout';
+        isAdmin=true;
+        document.getElementById('add-btn').style.display='block';
+        document.querySelector('.admin-btn').textContent='Logout';
         closeModal();
-        showMessage('Logged in successfully!', 'success');
+        showMessage('Logged in successfully!','success');
         displayPosts();
-    } catch (err) {
-        showMessage('Login failed: ' + err.message, 'error');
+    }catch(err){
+        showMessage('Login failed: '+err.message,'error');
     }
 }
 
-function openAddPost() {
-    const modal = document.getElementById('admin-modal');
-    document.getElementById('modal-title').textContent = 'Add New Post';
-    document.getElementById('modal-body').innerHTML = `
+function openAddPost(){
+    const modal=document.getElementById('admin-modal');
+    document.getElementById('modal-title').textContent='Add New Post';
+    document.getElementById('modal-body').innerHTML=`
         <div class="form-group">
             <label>Title:</label>
             <input type="text" id="post-title" placeholder="Enter title">
@@ -373,38 +373,38 @@ function openAddPost() {
     modal.classList.add('active');
 }
 
-async function savePost() {
-    const title = document.getElementById('post-title').value;
-    const type = document.getElementById('post-type').value;
-    const content = document.getElementById('post-content').value;
+async function savePost(){
+    const title=document.getElementById('post-title').value;
+    const type=document.getElementById('post-type').value;
+    const content=document.getElementById('post-content').value;
     
-    if (!title || !content) {
-        showMessage('Please fill in all fields', 'error');
+    if(!title||!content){
+        showMessage('Please fill in all fields','error');
         return;
     }
     
-    try {
-        const {error} = await sb.from('posts').insert([{title, type, content}]);
-        if (error) throw error;
+    try{
+        const{error}=await sb.from('posts').insert([{title,type,content}]);
+        if(error)throw error;
         
         closeModal();
-        showMessage('Post added successfully!', 'success');
+        showMessage('Post added successfully!','success');
         localStorage.removeItem(CACHE_KEY);
         await loadPosts();
-    } catch (err) {
-        showMessage('Error saving post: ' + err.message, 'error');
+    }catch(err){
+        showMessage('Error saving post: '+err.message,'error');
     }
 }
 
-function openEditPost(id) {
-    if (!isAdmin) return;
+function openEditPost(id){
+    if(!isAdmin)return;
     
-    const post = allPosts.find(p => p.id == id);
-    if (!post) return;
+    const post=allPosts.find(p=>p.id==id);
+    if(!post)return;
     
-    const modal = document.getElementById('admin-modal');
-    document.getElementById('modal-title').textContent = 'Edit Post';
-    document.getElementById('modal-body').innerHTML = `
+    const modal=document.getElementById('admin-modal');
+    document.getElementById('modal-title').textContent='Edit Post';
+    document.getElementById('modal-body').innerHTML=`
         <div class="form-group">
             <label>Title:</label>
             <input type="text" id="edit-title" value="${escapeHtml(post.title)}">
@@ -412,8 +412,8 @@ function openEditPost(id) {
         <div class="form-group">
             <label>Type:</label>
             <select id="edit-type">
-                <option value="article" ${post.type === 'article' ? 'selected' : ''}>Article</option>
-                <option value="poem" ${post.type === 'poem' ? 'selected' : ''}>Poem</option>
+                <option value="article" ${post.type==='article'?'selected':''}>Article</option>
+                <option value="poem" ${post.type==='poem'?'selected':''}>Poem</option>
             </select>
         </div>
         <div class="form-group">
@@ -429,64 +429,64 @@ function openEditPost(id) {
     modal.classList.add('active');
 }
 
-async function updatePost(id) {
-    const title = document.getElementById('edit-title').value;
-    const type = document.getElementById('edit-type').value;
-    const content = document.getElementById('edit-content').value;
+async function updatePost(id){
+    const title=document.getElementById('edit-title').value;
+    const type=document.getElementById('edit-type').value;
+    const content=document.getElementById('edit-content').value;
     
-    if (!title || !content) {
-        showMessage('Please fill in all fields', 'error');
+    if(!title||!content){
+        showMessage('Please fill in all fields','error');
         return;
     }
     
-    try {
-        const {error} = await sb.from('posts').update({title, type, content}).eq('id', id);
-        if (error) throw error;
+    try{
+        const{error}=await sb.from('posts').update({title,type,content}).eq('id',id);
+        if(error)throw error;
         
         closeModal();
-        showMessage('Post updated successfully!', 'success');
+        showMessage('Post updated successfully!','success');
         localStorage.removeItem(CACHE_KEY);
         await loadPosts();
-    } catch (err) {
-        showMessage('Error updating post: ' + err.message, 'error');
+    }catch(err){
+        showMessage('Error updating post: '+err.message,'error');
     }
 }
 
-async function deletePost(id) {
-    if (!confirm('Are you sure you want to delete this post?')) return;
+async function deletePost(id){
+    if(!confirm('Are you sure you want to delete this post?'))return;
     
-    try {
-        const {error} = await sb.from('posts').delete().eq('id', id);
-        if (error) throw error;
+    try{
+        const{error}=await sb.from('posts').delete().eq('id',id);
+        if(error)throw error;
         
         closeModal();
-        showMessage('Post deleted successfully!', 'success');
+        showMessage('Post deleted successfully!','success');
         localStorage.removeItem(CACHE_KEY);
         await loadPosts();
-    } catch (err) {
-        showMessage('Error deleting post: ' + err.message, 'error');
+    }catch(err){
+        showMessage('Error deleting post: '+err.message,'error');
     }
 }
 
-function closeModal() {
+function closeModal(){
     document.getElementById('admin-modal').classList.remove('active');
     document.getElementById('about-modal').classList.remove('active');
 }
 
-function showMessage(text, type) {
-    const msg = document.createElement('div');
-    msg.className = type;
-    msg.textContent = text;
+function showMessage(text,type){
+    const msg=document.createElement('div');
+    msg.className=type;
+    msg.textContent=text;
     document.body.appendChild(msg);
-    setTimeout(() => msg.remove(), 3000);
+    setTimeout(()=>msg.remove(),3000);
 }
 
-document.getElementById("admin-modal").addEventListener("click", function(e) {
-    if (e.target === this) closeModal();
+document.getElementById("admin-modal").addEventListener("click",function(e){
+    if(e.target===this)closeModal();
 });
 
-document.addEventListener("keydown", function(e) {
-    if (e.key === "Escape") closeModal();
+document.addEventListener("keydown",function(e){
+    if(e.key==="Escape")closeModal();
 });
 
 initSupabase();
