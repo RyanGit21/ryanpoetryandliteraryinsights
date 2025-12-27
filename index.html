@@ -251,7 +251,7 @@ textarea{min-height:200px;resize:vertical}
 
 <button id="add-btn" class="add-post-btn" onclick="openAddPost()" aria-label="Add new post">+</button>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async defer></script>
 <script>
 const SUPABASE_URL="https://zqmgtnnwrceagkshfapq.supabase.co";
 const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxbWd0bm53cmNlYWdrc2hmYXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3MDI2ODgsImV4cCI6MjA4MjI3ODY4OH0.Ql5KP6nfOSRzz1Z2eyN6WTqDsfVwZ0e9GKIbePa9eZE";
@@ -264,7 +264,7 @@ let currentPage=1;
 let searchQuery="";
 const POSTS_PER_PAGE=10;
 
-const CACHE_KEY='blog_posts_cache_v3';
+const CACHE_KEY='blog_posts_cache_v2';
 const CACHE_DURATION=30*60*1000;
 
 function loadTheme(){
@@ -411,9 +411,7 @@ function escapeHtml(text){
 }
 
 function formatDate(dateString){
-    if(!dateString)return'';
-    const date=new Date(dateString);
-    return date.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+    return new Date(dateString).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
 }
 
 function handleSearch(){
@@ -528,7 +526,7 @@ function displayPosts(){
             <article class="post-card ${escapeHtml(post.type)}" data-post-id="${post.id}" style="cursor:pointer;" itemscope itemtype="https://schema.org/BlogPosting">
                 <h3 itemprop="headline">${escapeHtml(post.title)}</h3>
                 <p class="post-date">
-                    <time itemprop="datePublished" datetime="${post.created_at||''}">
+                    <time itemprop="datePublished" datetime="${post.created_at}">
                         ${formatDate(post.created_at)}
                     </time>
                 </p>
@@ -554,7 +552,7 @@ function displayPosts(){
             <a href="${postUrl}" class="post-card ${escapeHtml(post.type)}" itemscope itemtype="https://schema.org/BlogPosting">
                 <h3 itemprop="headline">${escapeHtml(post.title)}</h3>
                 <p class="post-date">
-                    <time itemprop="datePublished" datetime="${post.created_at||''}">
+                    <time itemprop="datePublished" datetime="${post.created_at}">
                         ${formatDate(post.created_at)}
                     </time>
                 </p>
