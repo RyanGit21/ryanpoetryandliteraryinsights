@@ -56,7 +56,26 @@
 
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Georgia',serif;background:linear-gradient(135deg,var(--bg-gradient-start),var(--bg-gradient-end));color:var(--text-primary);line-height:1.6;min-height:100vh;transition:background 0.3s ease}
-.container{max-width:900px;margin:0 auto;padding:20px}
+
+/* Reading Progress Bar */
+.progress-container{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:4px;
+  background:rgba(255,255,255,0.2);
+  z-index:1000;
+}
+.progress-bar{
+  height:100%;
+  background:linear-gradient(90deg,var(--accent-blue),var(--accent-red));
+  width:0%;
+  transition:width 0.1s ease;
+  box-shadow:0 0 10px rgba(102,126,234,0.5);
+}
+
+.container{max-width:900px;margin:0 auto;padding:20px;padding-top:30px}
 .breadcrumb{color:rgba(255,255,255,0.9);padding:20px;font-size:0.9em;text-align:center}
 .breadcrumb a{color:white;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.3);transition:opacity 0.3s}
 .breadcrumb a:hover{opacity:0.7}
@@ -76,68 +95,54 @@ body{font-family:'Georgia',serif;background:linear-gradient(135deg,var(--bg-grad
 .post-content p{margin-bottom:20px}
 .post-content p:last-child{margin-bottom:0}
 
-/* Post Navigation Styles */
-.post-navigation{
+/* Navigation Buttons */
+.post-nav-buttons{
   display:flex;
   justify-content:space-between;
-  gap:20px;
+  align-items:center;
+  gap:15px;
   margin:40px 0;
-  flex-wrap:wrap;
+  padding:20px 0;
+  border-top:2px solid var(--border-color);
 }
-.nav-post{
-  flex:1;
-  min-width:250px;
-  background:var(--card-bg);
-  border-radius:15px;
-  padding:20px;
-  text-decoration:none;
-  color:var(--text-primary);
+.nav-btn-group{
+  display:flex;
+  gap:10px;
+}
+.nav-button{
+  padding:12px 24px;
+  background:var(--accent-blue);
+  color:white;
+  border:none;
+  border-radius:30px;
+  cursor:pointer;
+  font-size:1em;
+  font-weight:bold;
   transition:all 0.3s ease;
-  box-shadow:0 5px 20px var(--shadow);
-  border:2px solid transparent;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  text-decoration:none;
+  box-shadow:0 4px 15px rgba(102,126,234,0.3);
 }
-.nav-post:hover{
-  transform:translateY(-3px);
-  box-shadow:0 8px 30px var(--shadow);
-  border-color:var(--accent-blue);
+.nav-button:hover:not(:disabled){
+  background:#5568d3;
+  transform:translateY(-2px);
+  box-shadow:0 6px 20px rgba(102,126,234,0.4);
 }
-.nav-post.disabled{
+.nav-button:disabled{
   opacity:0.4;
   cursor:not-allowed;
-  pointer-events:none;
+  transform:none;
 }
-.nav-post.prev{
-  text-align:left;
+.nav-button.prev::before{
+  content:"←";
 }
-.nav-post.next{
-  text-align:right;
-}
-.nav-label{
-  font-size:0.85em;
-  color:var(--text-muted);
-  text-transform:uppercase;
-  letter-spacing:1px;
-  margin-bottom:8px;
-  display:flex;
-  align-items:center;
-  gap:5px;
-}
-.nav-post.prev .nav-label{justify-content:flex-start;}
-.nav-post.next .nav-label{justify-content:flex-end;}
-.nav-title{
-  font-size:1.1em;
-  font-weight:bold;
-  color:var(--accent-blue);
-  margin-bottom:5px;
-}
-.nav-excerpt{
-  font-size:0.9em;
-  color:var(--text-secondary);
-  line-height:1.5;
-  margin-top:8px;
+.nav-button.next::after{
+  content:"→";
 }
 
-.back-link{text-align:center;margin:30px 0}
+.back-link{text-align:center;margin:20px 0}
 .btn{padding:15px 30px;border-radius:8px;cursor:pointer;border:none;font-size:1em;transition:all 0.3s ease;font-weight:bold;text-decoration:none;display:inline-block}
 .btn:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(0,0,0,0.2)}
 .btn-secondary{background:rgba(255,255,255,0.2);color:white;border:2px solid white}
@@ -163,12 +168,18 @@ footer a:hover{opacity:0.7}
     .post-full h1{font-size:2em}
     .post-content{font-size:1.05em}
     .post-meta{gap:12px;font-size:0.9em}
-    .post-navigation{flex-direction:column;}
-    .nav-post{min-width:100%;}
+    .post-nav-buttons{flex-direction:column}
+    .nav-btn-group{width:100%;justify-content:space-between}
+    .nav-button{flex:1}
 }
 </style>
 </head>
 <body>
+<!-- Reading Progress Bar -->
+<div class="progress-container">
+  <div class="progress-bar" id="progressBar"></div>
+</div>
+
 <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
 <div class="container">
 <nav class="breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList" aria-label="Breadcrumb">
@@ -204,6 +215,22 @@ const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI
 let sb;
 let allPosts = [];
 let currentPost = null;
+
+// Reading Progress Bar
+function updateProgressBar() {
+  const progressBar = document.getElementById('progressBar');
+  if (!progressBar) return;
+  
+  const windowHeight = window.innerHeight;
+  const documentHeight = document.documentElement.scrollHeight - windowHeight;
+  const scrolled = window.scrollY;
+  const progress = (scrolled / documentHeight) * 100;
+  
+  progressBar.style.width = Math.min(progress, 100) + '%';
+}
+
+window.addEventListener('scroll', updateProgressBar);
+window.addEventListener('resize', updateProgressBar);
 
 function loadTheme(){
     const theme=localStorage.getItem('theme')||'light';
@@ -290,7 +317,7 @@ async function loadAllPosts(){
 function getAdjacentPosts(currentPostId){
     if(allPosts.length === 0) return {prev: null, next: null};
     
-    const currentIndex = allPosts.findIndex(p => p.id === currentPostId);
+    const currentIndex = allPosts.findIndex(p => p.id == currentPostId);
     if(currentIndex === -1) return {prev: null, next: null};
     
     return {
@@ -299,40 +326,29 @@ function getAdjacentPosts(currentPostId){
     };
 }
 
-function renderPostNavigation(currentPostId){
+function navigateToPost(postId){
+    if(!postId) return;
+    window.location.href = `post.html?id=${postId}`;
+}
+
+function renderNavigationButtons(currentPostId){
     const {prev, next} = getAdjacentPosts(currentPostId);
     
-    const prevHtml = prev ? `
-        <a href="post.html?id=${prev.id}" class="nav-post prev">
-            <div class="nav-label">← Previous</div>
-            <div class="nav-title">${escapeHtml(prev.title)}</div>
-            <div class="nav-excerpt">${escapeHtml(prev.content.substring(0, 80))}...</div>
-        </a>
-    ` : `
-        <div class="nav-post prev disabled">
-            <div class="nav-label">← Previous</div>
-            <div class="nav-title">No previous post</div>
-        </div>
-    `;
-    
-    const nextHtml = next ? `
-        <a href="post.html?id=${next.id}" class="nav-post next">
-            <div class="nav-label">Next →</div>
-            <div class="nav-title">${escapeHtml(next.title)}</div>
-            <div class="nav-excerpt">${escapeHtml(next.content.substring(0, 80))}...</div>
-        </a>
-    ` : `
-        <div class="nav-post next disabled">
-            <div class="nav-label">Next →</div>
-            <div class="nav-title">No next post</div>
-        </div>
-    `;
-    
     return `
-        <nav class="post-navigation" aria-label="Post navigation">
-            ${prevHtml}
-            ${nextHtml}
-        </nav>
+        <div class="post-nav-buttons">
+            <div class="nav-btn-group">
+                <button class="nav-button prev" ${!prev ? 'disabled' : ''} 
+                        onclick="navigateToPost(${prev ? prev.id : 'null'})" 
+                        aria-label="Previous post">
+                    Previous
+                </button>
+                <button class="nav-button next" ${!next ? 'disabled' : ''} 
+                        onclick="navigateToPost(${next ? next.id : 'null'})" 
+                        aria-label="Next post">
+                    Next
+                </button>
+            </div>
+        </div>
     `;
 }
 
@@ -433,7 +449,7 @@ function displayPost(post){
         p.trim()?`<p>${escapeHtml(p)}</p>`:''
     ).join('');
     
-    const navigationHtml = renderPostNavigation(post.id);
+    const navigationButtons = renderNavigationButtons(post.id);
     
     const postHtml=`
         <article class="post-full ${escapeHtml(post.type)}" itemscope itemtype="https://schema.org/BlogPosting">
@@ -455,13 +471,16 @@ function displayPost(post){
             <meta itemprop="author" content="Ryan">
             <meta itemprop="dateModified" content="${post.created_at}">
         </article>
-        ${navigationHtml}
+        ${navigationButtons}
         <div class="back-link">
             <a href="index.html" class="btn btn-secondary">← Back to all posts</a>
         </div>
     `;
     
     document.getElementById('post-container').innerHTML=postHtml;
+    
+    // Initialize progress bar after content is loaded
+    setTimeout(updateProgressBar, 100);
     
     if(window.requestIdleCallback){
         requestIdleCallback(()=>injectStructuredData(post),{timeout:1000});
