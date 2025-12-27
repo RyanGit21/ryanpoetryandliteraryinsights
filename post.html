@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-DYGKTNNN1P"></script>
 <script>
@@ -12,27 +11,22 @@
   gtag('js', new Date());
   gtag('config', 'G-DYGKTNNN1P');
 </script>
-
 <title>Post | Ryan's Poetic and Literary Insights</title>
 <meta name="description" content="Read this post from Ryan's collection of poetry and literary insights">
 <meta name="keywords" content="poetry, literary blog, creative writing, Ryan poetry">
 <meta name="author" content="Ryan">
 <meta name="robots" content="index, follow">
-
 <!-- Open Graph -->
 <meta property="og:type" content="article">
 <meta property="og:title" content="Post | Ryan's Poetic and Literary Insights">
 <meta property="og:description" content="Read this post from Ryan's collection">
 <meta property="og:site_name" content="Ryan's Poetic and Literary Insights">
-
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Post | Ryan's Poetic and Literary Insights">
 <meta name="twitter:description" content="Read this post from Ryan's collection">
-
 <link rel="preconnect" href="https://zqmgtnnwrceagkshfapq.supabase.co">
 <link rel="dns-prefetch" href="https://zqmgtnnwrceagkshfapq.supabase.co">
-
 <style>
 :root{
   --bg-gradient-start:#667eea;
@@ -81,6 +75,68 @@ body{font-family:'Georgia',serif;background:linear-gradient(135deg,var(--bg-grad
 .post-content{font-size:1.15em;line-height:1.9;color:var(--text-secondary)}
 .post-content p{margin-bottom:20px}
 .post-content p:last-child{margin-bottom:0}
+
+/* Post Navigation Styles */
+.post-navigation{
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  margin:40px 0;
+  flex-wrap:wrap;
+}
+.nav-post{
+  flex:1;
+  min-width:250px;
+  background:var(--card-bg);
+  border-radius:15px;
+  padding:20px;
+  text-decoration:none;
+  color:var(--text-primary);
+  transition:all 0.3s ease;
+  box-shadow:0 5px 20px var(--shadow);
+  border:2px solid transparent;
+}
+.nav-post:hover{
+  transform:translateY(-3px);
+  box-shadow:0 8px 30px var(--shadow);
+  border-color:var(--accent-blue);
+}
+.nav-post.disabled{
+  opacity:0.4;
+  cursor:not-allowed;
+  pointer-events:none;
+}
+.nav-post.prev{
+  text-align:left;
+}
+.nav-post.next{
+  text-align:right;
+}
+.nav-label{
+  font-size:0.85em;
+  color:var(--text-muted);
+  text-transform:uppercase;
+  letter-spacing:1px;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+.nav-post.prev .nav-label{justify-content:flex-start;}
+.nav-post.next .nav-label{justify-content:flex-end;}
+.nav-title{
+  font-size:1.1em;
+  font-weight:bold;
+  color:var(--accent-blue);
+  margin-bottom:5px;
+}
+.nav-excerpt{
+  font-size:0.9em;
+  color:var(--text-secondary);
+  line-height:1.5;
+  margin-top:8px;
+}
+
 .back-link{text-align:center;margin:30px 0}
 .btn{padding:15px 30px;border-radius:8px;cursor:pointer;border:none;font-size:1em;transition:all 0.3s ease;font-weight:bold;text-decoration:none;display:inline-block}
 .btn:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(0,0,0,0.2)}
@@ -107,12 +163,13 @@ footer a:hover{opacity:0.7}
     .post-full h1{font-size:2em}
     .post-content{font-size:1.05em}
     .post-meta{gap:12px;font-size:0.9em}
+    .post-navigation{flex-direction:column;}
+    .nav-post{min-width:100%;}
 }
 </style>
 </head>
 <body>
 <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
-
 <div class="container">
 <nav class="breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList" aria-label="Breadcrumb">
   <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
@@ -127,7 +184,6 @@ footer a:hover{opacity:0.7}
     <meta itemprop="position" content="2">
   </span>
 </nav>
-
 <main id="post-container">
 <div class="loading-container">
 <div class="spinner"></div>
@@ -135,19 +191,19 @@ footer a:hover{opacity:0.7}
 </div>
 </main>
 </div>
-
 <footer itemscope itemtype="https://schema.org/WPFooter">
 <p>&copy; <span itemprop="copyrightYear">2024</span> <span itemprop="copyrightHolder">Ryan's Poetic and Literary Insights</span></p>
 <p>Crafted with ❤️ and words</p>
 <p><a href="mailto:ryanlist35@gmail.com" itemprop="email">Contact</a></p>
 </footer>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async defer></script>
 <script>
 const SUPABASE_URL="https://zqmgtnnwrceagkshfapq.supabase.co";
 const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxbWd0bm53cmNlYWdrc2hmYXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3MDI2ODgsImV4cCI6MjA4MjI3ODY4OH0.Ql5KP6nfOSRzz1Z2eyN6WTqDsfVwZ0e9GKIbePa9eZE";
 
 let sb;
+let allPosts = [];
+let currentPost = null;
 
 function loadTheme(){
     const theme=localStorage.getItem('theme')||'light';
@@ -202,6 +258,84 @@ function setCachedPost(id,data){
     }catch(e){}
 }
 
+function getCachedAllPosts(){
+    try{
+        const cached=localStorage.getItem('blog_posts_cache_v2');
+        if(!cached)return null;
+        const{data,timestamp}=JSON.parse(cached);
+        if(Date.now()-timestamp<30*60*1000)return data;
+        return null;
+    }catch(e){
+        return null;
+    }
+}
+
+async function loadAllPosts(){
+    try{
+        const cached = getCachedAllPosts();
+        if(cached){
+            allPosts = cached;
+            return;
+        }
+        
+        const{data,error}=await sb.from('posts').select('id,title,type,content,created_at').order('created_at',{ascending:false});
+        if(!error && data){
+            allPosts = data;
+        }
+    }catch(e){
+        console.error('Error loading all posts:', e);
+    }
+}
+
+function getAdjacentPosts(currentPostId){
+    if(allPosts.length === 0) return {prev: null, next: null};
+    
+    const currentIndex = allPosts.findIndex(p => p.id === currentPostId);
+    if(currentIndex === -1) return {prev: null, next: null};
+    
+    return {
+        prev: currentIndex > 0 ? allPosts[currentIndex - 1] : null,
+        next: currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null
+    };
+}
+
+function renderPostNavigation(currentPostId){
+    const {prev, next} = getAdjacentPosts(currentPostId);
+    
+    const prevHtml = prev ? `
+        <a href="post.html?id=${prev.id}" class="nav-post prev">
+            <div class="nav-label">← Previous</div>
+            <div class="nav-title">${escapeHtml(prev.title)}</div>
+            <div class="nav-excerpt">${escapeHtml(prev.content.substring(0, 80))}...</div>
+        </a>
+    ` : `
+        <div class="nav-post prev disabled">
+            <div class="nav-label">← Previous</div>
+            <div class="nav-title">No previous post</div>
+        </div>
+    `;
+    
+    const nextHtml = next ? `
+        <a href="post.html?id=${next.id}" class="nav-post next">
+            <div class="nav-label">Next →</div>
+            <div class="nav-title">${escapeHtml(next.title)}</div>
+            <div class="nav-excerpt">${escapeHtml(next.content.substring(0, 80))}...</div>
+        </a>
+    ` : `
+        <div class="nav-post next disabled">
+            <div class="nav-label">Next →</div>
+            <div class="nav-title">No next post</div>
+        </div>
+    `;
+    
+    return `
+        <nav class="post-navigation" aria-label="Post navigation">
+            ${prevHtml}
+            ${nextHtml}
+        </nav>
+    `;
+}
+
 async function fetchPostInBackground(id){
     try{
         const{data,error}=await sb.from('posts').select('*').eq('id',id).single();
@@ -229,8 +363,12 @@ async function loadPost(){
         return;
     }
     
+    // Load all posts for navigation
+    await loadAllPosts();
+    
     const cached=getCachedPost(postId);
     if(cached){
+        currentPost = cached;
         displayPost(cached);
         fetchPostInBackground(postId);
         return;
@@ -245,12 +383,14 @@ async function loadPost(){
         if(error)throw error;
         if(!data)throw new Error('Post not found');
         
+        currentPost = data;
         setCachedPost(postId,data);
         displayPost(data);
     }catch(err){
         console.error('Error loading post:',err);
         const fallbackCache=getCachedPost(postId);
         if(fallbackCache){
+            currentPost = fallbackCache;
             displayPost(fallbackCache);
             showMessage('Showing cached version','error');
         }else{
@@ -293,6 +433,8 @@ function displayPost(post){
         p.trim()?`<p>${escapeHtml(p)}</p>`:''
     ).join('');
     
+    const navigationHtml = renderPostNavigation(post.id);
+    
     const postHtml=`
         <article class="post-full ${escapeHtml(post.type)}" itemscope itemtype="https://schema.org/BlogPosting">
             <header>
@@ -313,6 +455,7 @@ function displayPost(post){
             <meta itemprop="author" content="Ryan">
             <meta itemprop="dateModified" content="${post.created_at}">
         </article>
+        ${navigationHtml}
         <div class="back-link">
             <a href="index.html" class="btn btn-secondary">← Back to all posts</a>
         </div>
