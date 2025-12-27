@@ -264,8 +264,19 @@ let currentPage=1;
 let searchQuery="";
 const POSTS_PER_PAGE=10;
 
-const CACHE_KEY='blog_posts_cache_v2';
+const CACHE_KEY='blog_posts_cache_v4';
 const CACHE_DURATION=30*60*1000;
+
+try{
+    localStorage.removeItem('blog_posts_cache_v2');
+    localStorage.removeItem('blog_posts_cache_v3');
+    for(let i=0;i<localStorage.length;i++){
+        const key=localStorage.key(i);
+        if(key&&key.startsWith('post_')){
+            localStorage.removeItem(key);
+        }
+    }
+}catch(e){}
 
 function loadTheme(){
     const theme=localStorage.getItem('theme')||'light';
@@ -411,7 +422,15 @@ function escapeHtml(text){
 }
 
 function formatDate(dateString){
-    return new Date(dateString).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+    if(!dateString)return'';
+    const date=new Date(dateString);
+    if(isNaN(date.getTime()))return'';
+    return date.toLocaleDateString('en-US',{
+        timeZone:'UTC',
+        year:'numeric',
+        month:'long',
+        day:'numeric'
+    });
 }
 
 function handleSearch(){
@@ -526,7 +545,7 @@ function displayPosts(){
             <article class="post-card ${escapeHtml(post.type)}" data-post-id="${post.id}" style="cursor:pointer;" itemscope itemtype="https://schema.org/BlogPosting">
                 <h3 itemprop="headline">${escapeHtml(post.title)}</h3>
                 <p class="post-date">
-                    <time itemprop="datePublished" datetime="${post.created_at}">
+                    <time itemprop="datePublished" datetime="${post.created_at||''}">
                         ${formatDate(post.created_at)}
                     </time>
                 </p>
@@ -552,7 +571,7 @@ function displayPosts(){
             <a href="${postUrl}" class="post-card ${escapeHtml(post.type)}" itemscope itemtype="https://schema.org/BlogPosting">
                 <h3 itemprop="headline">${escapeHtml(post.title)}</h3>
                 <p class="post-date">
-                    <time itemprop="datePublished" datetime="${post.created_at}">
+                    <time itemprop="datePublished" datetime="${post.created_at||''}">
                         ${formatDate(post.created_at)}
                     </time>
                 </p>
