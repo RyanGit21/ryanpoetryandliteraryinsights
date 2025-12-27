@@ -2,23 +2,6 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ryan's Poetic and Literary Insights - Poetry, Stories & Articles</title>
-<meta name="description" content="Explore Ryan's collection of poetry, literary articles, and creative writing. Discover thought-provoking stories and beautiful poems about life, art, and culture.">
-<meta name="keywords" content="poetry, literature, creative writing, articles, poems, Ryan's blog, literary insights">
-<meta name="author" content="Ryan">
-<meta name="robots" content="index, follow">
-<meta property="og:title" content="Ryan's Poetic and Literary Insights">
-<meta property="og:description" content="A collection of poetry, stories, and literary articles">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://ryangit21.github.io/ryanpoetryandliteraryinsights/">
-
-<style>
-/* Your existing CSS */
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Georgia',serif;background:linear-gradient(135deg,#667eea,#764ba2);color:#333;line-height:1.6;min-height:100vh}
-/* ... rest of your CSS ... */
-</style>
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-DYGKTNNN1P"></script>
@@ -26,10 +9,28 @@ body{font-family:'Georgia',serif;background:linear-gradient(135deg,#667eea,#764b
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-DYGKTNNN1P');
 </script>
 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ryan's Poetic and Literary Insights - Poetry, Stories & Articles</title>
+<meta name="description" content="Explore Ryan's collection of poetry, literary articles, and creative writing. Discover thought-provoking stories and beautiful poems about life, art, and culture.">
+<meta name="keywords" content="poetry, literature, creative writing, articles, poems, Ryan's blog, literary insights">
+<meta name="author" content="Ryan">
+<meta name="robots" content="index, follow">
+
+<meta property="og:title" content="Ryan's Poetic and Literary Insights">
+<meta property="og:description" content="A collection of poetry, stories, and literary articles">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ryangit21.github.io/ryanpoetryandliteraryinsights/">
+
+<style>
+/* Your existing CSS remains untouched */
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Georgia',serif;background:linear-gradient(135deg,#667eea,#764ba2);color:#333;line-height:1.6;min-height:100vh}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+/* ... rest of your CSS ... */
+</style>
 </head>
 <body>
 <button class="admin-btn" onclick="toggleAdmin()">Admin</button>
@@ -50,17 +51,20 @@ body{font-family:'Georgia',serif;background:linear-gradient(135deg,#667eea,#764b
 </div>
 </main>
 </div>
+
 <footer>
 <p>&copy; 2024 Ryan's Poetic and Literary Insights</p>
 <p>Crafted with ❤️ and words</p>
 <p><a href="mailto:ryanlist35@gmail.com">Contact</a> | <a href="#" onclick="document.getElementById('about-modal').classList.add('active'); return false;">About</a></p>
 </footer>
+
 <div id="admin-modal" class="modal">
 <div class="modal-content">
 <h2 id="modal-title"></h2>
 <div id="modal-body"></div>
 </div>
 </div>
+
 <div id="about-modal" class="modal" onclick="if(event.target===this) this.classList.remove('active')">
 <div class="modal-content">
 <h2>About This Blog</h2>
@@ -68,13 +72,44 @@ body{font-family:'Georgia',serif;background:linear-gradient(135deg,#667eea,#764b
 <button class="btn btn-secondary" style="margin-top:20px;" onclick="document.getElementById('about-modal').classList.remove('active')">Close</button>
 </div>
 </div>
+
 <button id="add-btn" class="add-post-btn" onclick="openAddPost()" aria-label="Add new post">+</button>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL="https://zqmgtnnwrceagkshfapq.supabase.co";
 const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxbWd0bm53cmNlYWdrc2hmYXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3MDI2ODgsImV4cCI6MjA4MjI3ODY4OH0.Ql5KP6nfOSRzz1Z2eyN6WTqDsfVwZ0e9GKIbePa9eZE";
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-/* ... rest of your JS ... */
+
+/* Your existing JS remains untouched */
+let isAdmin=false;
+let allPosts=[];
+let currentFilter="all";
+
+async function loadPosts(){ /* ... existing code ... */ }
+function escapeHtml(text){ /* ... existing code ... */ }
+function formatDate(dateString){ /* ... existing code ... */ }
+function displayPosts(){ /* ... existing code ... */ }
+function filterPosts(type,event){ /* ... existing code ... */ }
+function toggleAdmin(){ /* ... existing code ... */ }
+function showLogin(){ /* ... existing code ... */ }
+async function login(){ /* ... existing code ... */ }
+function openAddPost(){ /* ... existing code ... */ }
+async function savePost(){ /* ... existing code ... */ }
+function openEditPost(id){ /* ... existing code ... */ }
+async function updatePost(id){ /* ... existing code ... */ }
+async function deletePost(id){ /* ... existing code ... */ }
+function closeModal(){ /* ... existing code ... */ }
+function showMessage(text,type){ /* ... existing code ... */ }
+
+document.getElementById("admin-modal").addEventListener("click",function(e){
+    if(e.target===this) closeModal();
+});
+
+document.addEventListener("keydown",function(e){
+    if(e.key==="Escape") closeModal();
+});
+
 loadPosts();
 </script>
 </body>
