@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-DYGKTNNN1P"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -16,64 +15,22 @@
 <meta name="keywords" content="poetry, literary blog, creative writing, Ryan poetry">
 <meta name="author" content="Ryan">
 <meta name="robots" content="index, follow">
-<!-- Open Graph -->
 <meta property="og:type" content="article">
 <meta property="og:title" content="Post | Ryan's Poetic and Literary Insights">
 <meta property="og:description" content="Read this post from Ryan's collection">
 <meta property="og:site_name" content="Ryan's Poetic and Literary Insights">
-<!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Post | Ryan's Poetic and Literary Insights">
 <meta name="twitter:description" content="Read this post from Ryan's collection">
 <link rel="preconnect" href="https://zqmgtnnwrceagkshfapq.supabase.co">
 <link rel="dns-prefetch" href="https://zqmgtnnwrceagkshfapq.supabase.co">
 <style>
-:root{
-  --bg-gradient-start:#667eea;
-  --bg-gradient-end:#764ba2;
-  --card-bg:#ffffff;
-  --text-primary:#333333;
-  --text-secondary:#666666;
-  --text-muted:#999999;
-  --border-color:#ddd;
-  --shadow:rgba(0,0,0,0.2);
-  --accent-blue:#667eea;
-  --accent-red:#ff6b6b;
-}
-
-[data-theme="dark"]{
-  --bg-gradient-start:#1a1a2e;
-  --bg-gradient-end:#16213e;
-  --card-bg:#2a2a3e;
-  --text-primary:#e0e0e0;
-  --text-secondary:#b0b0b0;
-  --text-muted:#808080;
-  --border-color:#444;
-  --shadow:rgba(0,0,0,0.5);
-  --accent-blue:#7d8ef5;
-  --accent-red:#ff8787;
-}
-
+:root{--bg-gradient-start:#667eea;--bg-gradient-end:#764ba2;--card-bg:#ffffff;--text-primary:#333333;--text-secondary:#666666;--text-muted:#999999;--border-color:#ddd;--shadow:rgba(0,0,0,0.2);--accent-blue:#667eea;--accent-red:#ff6b6b}
+[data-theme="dark"]{--bg-gradient-start:#1a1a2e;--bg-gradient-end:#16213e;--card-bg:#2a2a3e;--text-primary:#e0e0e0;--text-secondary:#b0b0b0;--text-muted:#808080;--border-color:#444;--shadow:rgba(0,0,0,0.5);--accent-blue:#7d8ef5;--accent-red:#ff8787}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Georgia',serif;background:linear-gradient(135deg,var(--bg-gradient-start),var(--bg-gradient-end));color:var(--text-primary);line-height:1.6;min-height:100vh;transition:background 0.3s ease}
-
-.progress-container{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:4px;
-  background:rgba(255,255,255,0.2);
-  z-index:1000;
-}
-.progress-bar{
-  height:100%;
-  background:linear-gradient(90deg,var(--accent-blue),var(--accent-red));
-  width:0%;
-  transition:width 0.1s ease;
-  box-shadow:0 0 10px rgba(102,126,234,0.5);
-}
-
+.progress-container{position:fixed;top:0;left:0;width:100%;height:4px;background:rgba(255,255,255,0.2);z-index:1000}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--accent-blue),var(--accent-red));width:0%;transition:width 0.1s ease;box-shadow:0 0 10px rgba(102,126,234,0.5)}
 .container{max-width:900px;margin:0 auto;padding:20px;padding-top:30px}
 .breadcrumb{color:rgba(255,255,255,0.9);padding:20px;font-size:0.9em;text-align:center}
 .breadcrumb a{color:white;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.3);transition:opacity 0.3s}
@@ -93,54 +50,13 @@ body{font-family:'Georgia',serif;background:linear-gradient(135deg,var(--bg-grad
 .post-content{font-size:1.15em;line-height:1.9;color:var(--text-secondary)}
 .post-content p{margin-bottom:20px}
 .post-content p:last-child{margin-bottom:0}
-
-.post-nav-buttons{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:15px;
-  margin:40px 0;
-  padding:20px 0;
-  border-top:2px solid var(--border-color);
-}
-.nav-btn-group{
-  display:flex;
-  gap:10px;
-}
-.nav-button{
-  padding:12px 24px;
-  background:var(--accent-blue);
-  color:white;
-  border:none;
-  border-radius:30px;
-  cursor:pointer;
-  font-size:1em;
-  font-weight:bold;
-  transition:all 0.3s ease;
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  text-decoration:none;
-  box-shadow:0 4px 15px rgba(102,126,234,0.3);
-}
-.nav-button:hover:not(:disabled){
-  background:#5568d3;
-  transform:translateY(-2px);
-  box-shadow:0 6px 20px rgba(102,126,234,0.4);
-}
-.nav-button:disabled{
-  opacity:0.4;
-  cursor:not-allowed;
-  transform:none;
-  box-shadow:none;
-}
-.nav-button.prev::before{
-  content:"←";
-}
-.nav-button.next::after{
-  content:"→";
-}
-
+.post-nav-buttons{display:flex;justify-content:space-between;align-items:center;gap:15px;margin:40px 0;padding:20px 0;border-top:2px solid var(--border-color)}
+.nav-btn-group{display:flex;gap:10px;width:100%}
+.nav-button{padding:12px 24px;background:var(--accent-blue);color:white;border:none;border-radius:30px;cursor:pointer;font-size:1em;font-weight:bold;transition:all 0.3s ease;display:inline-flex;align-items:center;gap:8px;text-decoration:none;box-shadow:0 4px 15px rgba(102,126,234,0.3)}
+.nav-button:hover:not(:disabled){background:#5568d3;transform:translateY(-2px);box-shadow:0 6px 20px rgba(102,126,234,0.4)}
+.nav-button:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
+.nav-button.prev::before{content:"←"}
+.nav-button.next::after{content:"→"}
 .back-link{text-align:center;margin:20px 0}
 .btn{padding:15px 30px;border-radius:8px;cursor:pointer;border:none;font-size:1em;transition:all 0.3s ease;font-weight:bold;text-decoration:none;display:inline-block}
 .btn:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(0,0,0,0.2)}
@@ -162,43 +78,19 @@ footer{background:rgba(0,0,0,0.3);color:white;text-align:center;padding:30px 20p
 footer p{margin:5px 0;opacity:0.9}
 footer a{color:white;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.5);transition:opacity 0.3s}
 footer a:hover{opacity:0.7}
-@media(max-width:768px){
-    .post-full{padding:30px 25px}
-    .post-full h1{font-size:2em}
-    .post-content{font-size:1.05em}
-    .post-meta{gap:12px;font-size:0.9em}
-    .post-nav-buttons{flex-direction:column}
-    .nav-btn-group{width:100%;justify-content:space-between}
-    .nav-button{flex:1}
-}
+@media(max-width:768px){.post-full{padding:30px 25px}.post-full h1{font-size:2em}.post-content{font-size:1.05em}.post-meta{gap:12px;font-size:0.9em}.post-nav-buttons{flex-direction:column}.nav-btn-group{width:100%;justify-content:space-between}.nav-button{flex:1}}
 </style>
 </head>
 <body>
-<div class="progress-container">
-  <div class="progress-bar" id="progressBar"></div>
-</div>
-
+<div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
 <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
 <div class="container">
 <nav class="breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList" aria-label="Breadcrumb">
-  <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-    <a itemprop="item" href="index.html">
-      <span itemprop="name">Home</span>
-    </a>
-    <meta itemprop="position" content="1">
-  </span>
-  <span style="margin:0 8px">›</span>
-  <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-    <span itemprop="name">Loading...</span>
-    <meta itemprop="position" content="2">
-  </span>
+<span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a itemprop="item" href="index.html"><span itemprop="name">Home</span></a><meta itemprop="position" content="1"></span>
+<span style="margin:0 8px">›</span>
+<span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><span itemprop="name">Loading...</span><meta itemprop="position" content="2"></span>
 </nav>
-<main id="post-container">
-<div class="loading-container">
-<div class="spinner"></div>
-<p>Loading post...</p>
-</div>
-</main>
+<main id="post-container"><div class="loading-container"><div class="spinner"></div><p>Loading post...</p></div></main>
 </div>
 <footer itemscope itemtype="https://schema.org/WPFooter">
 <p>&copy; <span itemprop="copyrightYear">2024</span> <span itemprop="copyrightHolder">Ryan's Poetic and Literary Insights</span></p>
@@ -209,356 +101,29 @@ footer a:hover{opacity:0.7}
 <script>
 const SUPABASE_URL="https://zqmgtnnwrceagkshfapq.supabase.co";
 const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxbWd0bm53cmNlYWdrc2hmYXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3MDI2ODgsImV4cCI6MjA4MjI3ODY4OH0.Ql5KP6nfOSRzz1Z2eyN6WTqDsfVwZ0e9GKIbePa9eZE";
-
-let sb;
-let allPosts = [];
-let currentPost = null;
-
-function updateProgressBar() {
-  const progressBar = document.getElementById('progressBar');
-  if (!progressBar) return;
-  
-  const windowHeight = window.innerHeight;
-  const documentHeight = document.documentElement.scrollHeight - windowHeight;
-  const scrolled = window.scrollY;
-  const progress = (scrolled / documentHeight) * 100;
-  
-  progressBar.style.width = Math.min(progress, 100) + '%';
-}
-
-window.addEventListener('scroll', updateProgressBar);
-window.addEventListener('resize', updateProgressBar);
-
-function loadTheme(){
-    const theme=localStorage.getItem('theme')||'light';
-    document.documentElement.setAttribute('data-theme',theme);
-    document.querySelector('.theme-toggle').textContent=theme==='dark'?'☀️':'🌙';
-}
-
-function toggleTheme(){
-    const current=document.documentElement.getAttribute('data-theme')||'light';
-    const next=current==='light'?'dark':'light';
-    document.documentElement.setAttribute('data-theme',next);
-    localStorage.setItem('theme',next);
-    document.querySelector('.theme-toggle').textContent=next==='dark'?'☀️':'🌙';
-}
-
-function calculateReadingTime(text){
-    const wordsPerMinute=200;
-    const words=text.trim().split(/\s+/).length;
-    const minutes=Math.ceil(words/wordsPerMinute);
-    return minutes;
-}
-
-function escapeHtml(text){
-    const div=document.createElement('div');
-    div.textContent=text;
-    return div.innerHTML;
-}
-
-function formatDate(dateString){
-    return new Date(dateString).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-}
-
-function getCachedPost(id){
-    try{
-        const cached=localStorage.getItem('post_'+id);
-        if(!cached)return null;
-        const{data,timestamp}=JSON.parse(cached);
-        if(Date.now()-timestamp<30*60*1000)return data;
-        localStorage.removeItem('post_'+id);
-        return null;
-    }catch(e){
-        return null;
-    }
-}
-
-function setCachedPost(id,data){
-    try{
-        localStorage.setItem('post_'+id,JSON.stringify({
-            data:data,
-            timestamp:Date.now()
-        }));
-    }catch(e){}
-}
-
-function getCachedAllPosts(){
-    try{
-        const cached=localStorage.getItem('all_posts_cache');
-        if(!cached)return null;
-        const{data,timestamp}=JSON.parse(cached);
-        if(Date.now()-timestamp<30*60*1000)return data;
-        localStorage.removeItem('all_posts_cache');
-        return null;
-    }catch(e){
-        return null;
-    }
-}
-
-function setCachedAllPosts(data){
-    try{
-        localStorage.setItem('all_posts_cache',JSON.stringify({
-            data:data,
-            timestamp:Date.now()
-        }));
-    }catch(e){}
-}
-
-async function loadAllPosts(){
-    try{
-        const cached = getCachedAllPosts();
-        if(cached && cached.length > 0){
-            allPosts = cached;
-            return true;
-        }
-        
-        const{data,error}=await sb.from('posts').select('id,title,type,created_at').order('created_at',{ascending:false});
-        
-        if(error){
-            return false;
-        }
-        
-        if(data && data.length > 0){
-            allPosts = data;
-            setCachedAllPosts(data);
-            return true;
-        }
-        
-        return false;
-    }catch(e){
-        return false;
-    }
-}
-
-function getAdjacentPosts(currentPostId){
-    if(!allPosts || allPosts.length === 0){
-        return {prev: null, next: null};
-    }
-    
-    const currentIndex = allPosts.findIndex(p => String(p.id) === String(currentPostId));
-    
-    if(currentIndex === -1){
-        return {prev: null, next: null};
-    }
-    
-    const prev = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
-    const next = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
-    
-    return {prev, next};
-}
-
-window.navigateToPost = function(postId){
-    if(!postId) return;
-    window.location.href = `post.html?id=${postId}`;
-}
-
-function renderNavigationButtons(currentPostId){
-    const {prev, next} = getAdjacentPosts(currentPostId);
-    
-    const prevButton = prev 
-        ? `<button class="nav-button prev" onclick="navigateToPost(${prev.id})" aria-label="Previous post">Previous</button>`
-        : `<button class="nav-button prev" disabled aria-label="No previous post">Previous</button>`;
-    
-    const nextButton = next 
-        ? `<button class="nav-button next" onclick="navigateToPost(${next.id})" aria-label="Next post">Next</button>`
-        : `<button class="nav-button next" disabled aria-label="No next post">Next</button>`;
-    
-    return `
-        <div class="post-nav-buttons">
-            <div class="nav-btn-group">
-                ${prevButton}
-                ${nextButton}
-            </div>
-        </div>
-    `;
-}
-
-async function fetchPostInBackground(id){
-    try{
-        const{data,error}=await sb.from('posts').select('*').eq('id',id).single();
-        if(!error&&data){
-            setCachedPost(id,data);
-        }
-    }catch(e){}
-}
-
-function initSupabase(){
-    if(window.supabase){
-        sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-        loadPost();
-    }else{
-        setTimeout(initSupabase,100);
-    }
-}
-
-async function loadPost(){
-    const urlParams=new URLSearchParams(window.location.search);
-    const postId=urlParams.get('id');
-    
-    if(!postId){
-        showError('No post ID provided');
-        return;
-    }
-    
-    await loadAllPosts();
-    
-    const cached=getCachedPost(postId);
-    if(cached){
-        currentPost = cached;
-        displayPost(cached);
-        fetchPostInBackground(postId);
-        return;
-    }
-    
-    try{
-        const{data,error}=await Promise.race([
-            sb.from('posts').select('*').eq('id',postId).single(),
-            new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout')),8000))
-        ]);
-        
-        if(error)throw error;
-        if(!data)throw new Error('Post not found');
-        
-        currentPost = data;
-        setCachedPost(postId,data);
-        displayPost(data);
-    }catch(err){
-        const fallbackCache=getCachedPost(postId);
-        if(fallbackCache){
-            currentPost = fallbackCache;
-            displayPost(fallbackCache);
-            showMessage('Showing cached version','error');
-        }else{
-            showError('Failed to load post: '+err.message);
-        }
-    }
-}
-
-function displayPost(post){
-    document.title=`${post.title} | Ryan's Poetic and Literary Insights`;
-    
-    const metaDesc=document.querySelector('meta[name="description"]');
-    if(metaDesc)metaDesc.content=post.content.substring(0,150);
-    
-    const ogTitle=document.querySelector('meta[property="og:title"]');
-    if(ogTitle)ogTitle.content=post.title;
-    
-    const ogDesc=document.querySelector('meta[property="og:description"]');
-    if(ogDesc)ogDesc.content=post.content.substring(0,150);
-    
-    const breadcrumb=document.querySelector('.breadcrumb');
-    if(breadcrumb){
-        breadcrumb.innerHTML=`
-            <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-                <a itemprop="item" href="index.html">
-                    <span itemprop="name">Home</span>
-                </a>
-                <meta itemprop="position" content="1">
-            </span>
-            <span style="margin:0 8px">›</span>
-            <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-                <span itemprop="name">${escapeHtml(post.title)}</span>
-                <meta itemprop="position" content="2">
-            </span>
-        `;
-    }
-    
-    const readTime=calculateReadingTime(post.content);
-    const formattedContent=post.content.split('\n').map(p=>
-        p.trim()?`<p>${escapeHtml(p)}</p>`:''
-    ).join('');
-    
-    const navigationButtons = renderNavigationButtons(post.id);
-    
-    const postHtml=`
-        <article class="post-full ${escapeHtml(post.type)}" itemscope itemtype="https://schema.org/BlogPosting">
-            <header>
-                <h1 itemprop="headline">${escapeHtml(post.title)}</h1>
-                <div class="post-meta">
-                    <time itemprop="datePublished" datetime="${post.created_at}">
-                        ${formatDate(post.created_at)}
-                    </time>
-                    <span class="reading-time" itemprop="timeRequired" content="PT${readTime}M">
-                        ${readTime} min read
-                    </span>
-                    <span class="post-type-badge">${post.type}</span>
-                </div>
-            </header>
-            <div class="post-content" itemprop="articleBody">
-                ${formattedContent}
-            </div>
-            <meta itemprop="author" content="Ryan">
-            <meta itemprop="dateModified" content="${post.created_at}">
-        </article>
-        ${navigationButtons}
-        <div class="back-link">
-            <a href="index.html" class="btn btn-secondary">← Back to all posts</a>
-        </div>
-    `;
-    
-    document.getElementById('post-container').innerHTML=postHtml;
-    
-    setTimeout(updateProgressBar, 100);
-    
-    if(window.requestIdleCallback){
-        requestIdleCallback(()=>injectStructuredData(post),{timeout:1000});
-    }else{
-        setTimeout(()=>injectStructuredData(post),0);
-    }
-}
-
-function injectStructuredData(post){
-    const existingScript=document.getElementById('post-schema');
-    if(existingScript)existingScript.remove();
-    
-    const schema={
-        "@context":"https://schema.org",
-        "@type":"BlogPosting",
-        "headline":post.title,
-        "datePublished":post.created_at,
-        "dateModified":post.created_at,
-        "author":{
-            "@type":"Person",
-            "name":"Ryan"
-        },
-        "publisher":{
-            "@type":"Person",
-            "name":"Ryan"
-        },
-        "description":post.content.substring(0,150),
-        "articleBody":post.content,
-        "wordCount":post.content.split(/\s+/).length,
-        "inLanguage":"en-US"
-    };
-    
-    const script=document.createElement('script');
-    script.type='application/ld+json';
-    script.id='post-schema';
-    script.textContent=JSON.stringify(schema);
-    document.head.appendChild(script);
-}
-
-function showError(message){
-    document.getElementById('post-container').innerHTML=`
-        <div class="error-container">
-            <h2>Oops!</h2>
-            <p>${escapeHtml(message)}</p>
-            <a href="index.html" class="btn btn-secondary">← Back to all posts</a>
-        </div>
-    `;
-}
-
-function showMessage(text,type){
-    const msg=document.createElement('div');
-    msg.className=type;
-    msg.textContent=text;
-    msg.setAttribute('role','alert');
-    document.body.appendChild(msg);
-    setTimeout(()=>msg.remove(),3000);
-}
-
-loadTheme();
-initSupabase();
+let sb,allPosts=[],currentPost=null;
+function updateProgressBar(){const e=document.getElementById("progressBar");if(!e)return;const t=window.innerHeight,n=document.documentElement.scrollHeight-t,o=window.scrollY,r=o/n*100;e.style.width=Math.min(r,100)+"%"}
+window.addEventListener("scroll",updateProgressBar);window.addEventListener("resize",updateProgressBar);
+function loadTheme(){const e=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",e);document.querySelector(".theme-toggle").textContent="dark"===e?"☀️":"🌙"}
+function toggleTheme(){const e=document.documentElement.getAttribute("data-theme")||"light",t="light"===e?"dark":"light";document.documentElement.setAttribute("data-theme",t);localStorage.setItem("theme",t);document.querySelector(".theme-toggle").textContent="dark"===t?"☀️":"🌙"}
+function calculateReadingTime(e){return Math.ceil(e.trim().split(/\s+/).length/200)}
+function escapeHtml(e){const t=document.createElement("div");return t.textContent=e,t.innerHTML}
+function formatDate(e){return new Date(e).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"})}
+function getCachedPost(e){try{const t=localStorage.getItem("post_"+e);if(!t)return null;const{data:n,timestamp:o}=JSON.parse(t);return Date.now()-o<18e5?n:(localStorage.removeItem("post_"+e),null)}catch(e){return null}}
+function setCachedPost(e,t){try{localStorage.setItem("post_"+e,JSON.stringify({data:t,timestamp:Date.now()}))}catch(e){}}
+function getCachedAllPosts(){try{const e=localStorage.getItem("blog_posts_all");if(!e)return null;const{data:t,timestamp:n}=JSON.parse(e);return Date.now()-n<18e5?t:null}catch(e){return null}}
+function setCachedAllPosts(e){try{localStorage.setItem("blog_posts_all",JSON.stringify({data:e,timestamp:Date.now()}))}catch(e){}}
+async function loadAllPosts(){const e=getCachedAllPosts();if(e&&Array.isArray(e)&&e.length>0)return void(allPosts=e);try{const{data:e,error:t}=await sb.from("posts").select("id,title,type,created_at").order("created_at",{ascending:!1});!t&&e&&Array.isArray(e)&&(allPosts=e,setCachedAllPosts(e))}catch(e){console.error("Failed to load posts:",e)}}
+function getAdjacentPosts(e){if(0===allPosts.length)return{prev:null,next:null};const t=parseInt(e),n=allPosts.findIndex(e=>parseInt(e.id)===t);return-1===n?{prev:null,next:null}:{prev:n>0?allPosts[n-1]:null,next:n<allPosts.length-1?allPosts[n+1]:null}}
+function renderNavigationButtons(e){const{prev:t,next:n}=getAdjacentPosts(e);return`<div class="post-nav-buttons"><div class="nav-btn-group"><button class="nav-button prev" ${t?"":'disabled'} ${t?`onclick="location.href='post.html?id=${t.id}'"`:""}>Previous</button><button class="nav-button next" ${n?"":'disabled'} ${n?`onclick="location.href='post.html?id=${n.id}'"`:""}>Next</button></div></div>`}
+async function fetchPostInBackground(e){try{const{data:t,error:n}=await sb.from("posts").select("*").eq("id",e).single();!n&&t&&setCachedPost(e,t)}catch(e){}}
+function initSupabase(){window.supabase?(sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY),loadPost()):setTimeout(initSupabase,100)}
+async function loadPost(){const e=new URLSearchParams(window.location.search).get("id");if(!e)return void showError("No post ID provided");await loadAllPosts();const t=getCachedPost(e);if(t)return currentPost=t,displayPost(t),void fetchPostInBackground(e);try{const{data:t,error:n}=await Promise.race([sb.from("posts").select("*").eq("id",e).single(),new Promise((e,t)=>setTimeout(()=>t(new Error("Timeout")),8e3))]);if(n)throw n;if(!t)throw new Error("Post not found");currentPost=t,setCachedPost(e,t),displayPost(t)}catch(t){const n=getCachedPost(e);n?(currentPost=n,displayPost(n),showMessage("Showing cached version","error")):showError("Failed to load post: "+t.message)}}
+function displayPost(e){document.title=`${e.title} | Ryan's Poetic and Literary Insights`;const t=document.querySelector('meta[name="description"]');t&&(t.content=e.content.substring(0,150));const n=document.querySelector('meta[property="og:title"]');n&&(n.content=e.title);const o=document.querySelector('meta[property="og:description"]');o&&(o.content=e.content.substring(0,150));const r=document.querySelector(".breadcrumb");r&&(r.innerHTML=`<span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a itemprop="item" href="index.html"><span itemprop="name">Home</span></a><meta itemprop="position" content="1"></span><span style="margin:0 8px">›</span><span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><span itemprop="name">${escapeHtml(e.title)}</span><meta itemprop="position" content="2"></span>`);const a=calculateReadingTime(e.content),s=e.content.split("\n").map(e=>e.trim()?`<p>${escapeHtml(e)}</p>`:"").join(""),i=renderNavigationButtons(e.id),c=`<article class="post-full ${escapeHtml(e.type)}" itemscope itemtype="https://schema.org/BlogPosting"><header><h1 itemprop="headline">${escapeHtml(e.title)}</h1><div class="post-meta"><time itemprop="datePublished" datetime="${e.created_at}">${formatDate(e.created_at)}</time><span class="reading-time" itemprop="timeRequired" content="PT${a}M">${a} min read</span><span class="post-type-badge">${e.type}</span></div></header><div class="post-content" itemprop="articleBody">${s}</div><meta itemprop="author" content="Ryan"><meta itemprop="dateModified" content="${e.created_at}"></article>${i}<div class="back-link"><a href="index.html" class="btn btn-secondary">← Back to all posts</a></div>`;document.getElementById("post-container").innerHTML=c,setTimeout(updateProgressBar,100),window.requestIdleCallback?requestIdleCallback(()=>injectStructuredData(e),{timeout:1e3}):setTimeout(()=>injectStructuredData(e),0)}
+function injectStructuredData(e){const t=document.getElementById("post-schema");t&&t.remove();const n={"@context":"https://schema.org","@type":"BlogPosting",headline:e.title,datePublished:e.created_at,dateModified:e.created_at,author:{"@type":"Person",name:"Ryan"},publisher:{"@type":"Person",name:"Ryan"},description:e.content.substring(0,150),articleBody:e.content,wordCount:e.content.split(/\s+/).length,inLanguage:"en-US"},o=document.createElement("script");o.type="application/ld+json",o.id="post-schema",o.textContent=JSON.stringify(n),document.head.appendChild(o)}
+function showError(e){document.getElementById("post-container").innerHTML=`<div class="error-container"><h2>Oops!</h2><p>${escapeHtml(e)}</p><a href="index.html" class="btn btn-secondary">← Back to all posts</a></div>`}
+function showMessage(e,t){const n=document.createElement("div");n.className=t,n.textContent=e,n.setAttribute("role","alert"),document.body.appendChild(n),setTimeout(()=>n.remove(),3e3)}
+loadTheme();initSupabase();
 </script>
 </body>
 </html>
