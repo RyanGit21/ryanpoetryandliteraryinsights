@@ -255,7 +255,7 @@ function displayPosts() {
     }
     
     container.innerHTML = filtered.map(post => `
-        <article class="post-card ${escapeHtml(post.type)}" onclick="${isAdmin ? `openEditPost(${post.id})` : ''}">
+        <article class="post-card ${escapeHtml(post.type)}" onclick="${isAdmin ? `openEditPost(${post.id})` : `window.location.href='post.html?id=${post.id}'`}">
             <h3>${escapeHtml(post.title)}</h3>
             <p class="post-date">${formatDate(post.created_at)}</p>
             <p class="post-excerpt">${escapeHtml(post.content.substring(0, 150))}${post.content.length > 150 ? '...' : ''}</p>
