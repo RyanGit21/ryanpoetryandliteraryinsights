@@ -15,6 +15,10 @@
 <meta property="og:type" content="article">
 <meta property="og:url" content="" id="og-url">
 
+<!-- Preconnect to Supabase for faster loading -->
+<link rel="preconnect" href="https://zqmgtnnwrceagkshfapq.supabase.co">
+<link rel="dns-prefetch" href="https://zqmgtnnwrceagkshfapq.supabase.co">
+
 <script type="application/ld+json" id="schema-data">
 {"@context":"https://schema.org","@type":"BlogPosting","headline":"","author":{"@type":"Person","name":"Ryan"},"datePublished":"","description":""}
 </script>
@@ -67,14 +71,50 @@ article.poem .article-content{white-space:pre-wrap;font-style:italic}
 </main>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Load Supabase with async to not block rendering -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async></script>
 <script>
 const SUPABASE_URL="https://zqmgtnnwrceagkshfapq.supabase.co";
 const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxbWd0bm53cmNlYWdrc2hmYXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3MDI2ODgsImV4cCI6MjA4MjI3ODY4OH0.Ql5KP6nfOSRzz1Z2eyN6WTqDsfVwZ0e9GKIbePa9eZE";
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+let sb;
 const params = new URLSearchParams(window.location.search);
 const postId = params.get("id");
+
+// Cache individual posts for 10 minutes
+const CACHE_PREFIX = 'post_';
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+
+function getCachedPost(id) {
+    try {
+        const cached = localStorage.getItem(CACHE_PREFIX + id);
+        if (!cached) return null;
+        
+        const {data, timestamp} = JSON.parse(cached);
+        const now = Date.now();
+        
+        if (now - timestamp < CACHE_DURATION) {
+            return data;
+        }
+        
+        localStorage.removeItem(CACHE_PREFIX + id);
+        return null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function setCachedPost(id, post) {
+    try {
+        const cacheData = {
+            data: post,
+            timestamp: Date.now()
+        };
+        localStorage.setItem(CACHE_PREFIX + id, JSON.stringify(cacheData));
+    } catch (e) {
+        // Ignore if localStorage is full
+    }
+}
 
 function escapeHtml(text){
   const div=document.createElement("div");
@@ -87,19 +127,15 @@ function formatDate(date){
 }
 
 function updateMetadata(post){
-  // Update page title
   document.title = `${post.title} - Ryan's Poetic and Literary Insights`;
   
-  // Update description meta tag
   const description = post.content.substring(0, 155) + (post.content.length > 155 ? '...' : '');
   document.querySelector('meta[name="description"]').setAttribute('content', description);
   
-  // Update Open Graph tags
   document.getElementById('og-title').setAttribute('content', post.title);
   document.getElementById('og-description').setAttribute('content', description);
   document.getElementById('og-url').setAttribute('content', window.location.href);
   
-  // Update structured data
   const schemaData = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -114,34 +150,9 @@ function updateMetadata(post){
   document.getElementById('schema-data').textContent = JSON.stringify(schemaData);
 }
 
-async function loadPost(){
-  if(!postId){
-    document.getElementById("main-content").innerHTML=`
-      <div class="error-container">
-        <h2>Post Not Found</h2>
-        <p>The post you're looking for doesn't exist or the link is incorrect.</p>
-        <a href="index.html">Return to Homepage</a>
-      </div>
-    `;
-    document.title = "Post Not Found - Ryan's Poetic and Literary Insights";
-    return;
-  }
-
-  try {
-    const {data, error} = await sb
-      .from("posts")
-      .select("*")
-      .eq("id", postId)
-      .single();
-
-    if(error || !data){
-      throw new Error('Post not found');
-    }
-
-    // Update metadata for SEO
+function renderPost(data) {
     updateMetadata(data);
 
-    // Format content based on type
     const content = data.type === "poem"
       ? escapeHtml(data.content)
       : data.content.split("\n\n").map(p => `<p>${escapeHtml(p)}</p>`).join("");
@@ -156,20 +167,94 @@ async function loadPost(){
         <div class="article-content">${content}</div>
       </article>
     `;
-  } catch(err) {
-    console.error('Error loading post:', err);
+}
+
+function showError(title, message) {
     document.getElementById("main-content").innerHTML=`
       <div class="error-container">
-        <h2>Oops! Something went wrong</h2>
-        <p>We couldn't load this post. Please try again later.</p>
+        <h2>${title}</h2>
+        <p>${message}</p>
         <a href="index.html">Return to Homepage</a>
       </div>
     `;
-    document.title = "Error - Ryan's Poetic and Literary Insights";
+    document.title = `${title} - Ryan's Poetic and Literary Insights`;
+}
+
+async function loadPost(){
+  if(!postId){
+    showError("Post Not Found", "The post you're looking for doesn't exist or the link is incorrect.");
+    return;
+  }
+
+  // Try cache first
+  const cachedPost = getCachedPost(postId);
+  if (cachedPost) {
+    renderPost(cachedPost);
+    // Fetch fresh data in background
+    fetchPostInBackground();
+    return;
+  }
+
+  // No cache, fetch with timeout
+  try {
+    const {data, error} = await Promise.race([
+      sb.from("posts").select("*").eq("id", postId).single(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 8000))
+    ]);
+
+    if(error || !data){
+      throw new Error('Post not found');
+    }
+
+    setCachedPost(postId, data);
+    renderPost(data);
+  } catch(err) {
+    console.error('Error loading post:', err);
+    
+    // Try to show expired cache as fallback
+    try {
+        const expiredCache = localStorage.getItem(CACHE_PREFIX + postId);
+        if (expiredCache) {
+            const {data} = JSON.parse(expiredCache);
+            renderPost(data);
+            // Show subtle warning
+            const warning = document.createElement('div');
+            warning.style.cssText = 'position:fixed;top:10px;right:10px;background:rgba(255,193,7,0.9);color:#333;padding:10px 20px;border-radius:8px;font-size:0.9em;z-index:1000;';
+            warning.textContent = 'Offline mode - showing cached version';
+            document.body.appendChild(warning);
+            setTimeout(() => warning.remove(), 3000);
+            return;
+        }
+    } catch (e) {}
+    
+    showError("Oops! Something went wrong", "We couldn't load this post. Please check your connection and try again.");
   }
 }
 
-loadPost();
+async function fetchPostInBackground() {
+    try {
+        const {data, error} = await sb.from("posts").select("*").eq("id", postId).single();
+        if (!error && data) {
+            setCachedPost(postId, data);
+            // Silently update if content changed
+            renderPost(data);
+        }
+    } catch (e) {
+        // Silently fail - user already has cached data
+    }
+}
+
+// Initialize Supabase when library loads
+function initSupabase() {
+    if (window.supabase) {
+        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        loadPost();
+    } else {
+        setTimeout(initSupabase, 100);
+    }
+}
+
+initSupabase();
 </script>
 </body>
 </html>
