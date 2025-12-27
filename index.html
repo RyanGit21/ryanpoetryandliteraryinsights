@@ -267,17 +267,6 @@ const POSTS_PER_PAGE=10;
 const CACHE_KEY='blog_posts_cache_v4';
 const CACHE_DURATION=30*60*1000;
 
-try{
-    localStorage.removeItem('blog_posts_cache_v2');
-    localStorage.removeItem('blog_posts_cache_v3');
-    for(let i=0;i<localStorage.length;i++){
-        const key=localStorage.key(i);
-        if(key&&key.startsWith('post_')){
-            localStorage.removeItem(key);
-        }
-    }
-}catch(e){}
-
 function loadTheme(){
     const theme=localStorage.getItem('theme')||'light';
     document.documentElement.setAttribute('data-theme',theme);
@@ -378,7 +367,7 @@ function injectStructuredData(){
     const existingScript=document.getElementById('blog-posts-schema');
     if(existingScript)existingScript.remove();
     
-    const blogPosts=allPosts.slice(0,10).map(post=>({
+    const blogPosts=allPosts.filter(post=>post.created_at).slice(0,10).map(post=>({
         "@type":"BlogPosting",
         "headline":post.title,
         "datePublished":post.created_at,
@@ -422,9 +411,9 @@ function escapeHtml(text){
 }
 
 function formatDate(dateString){
-    if(!dateString)return'';
+    if(!dateString)return null;
     const date=new Date(dateString);
-    if(isNaN(date.getTime()))return'';
+    if(isNaN(date.getTime()))return null;
     return date.toLocaleDateString('en-US',{
         timeZone:'UTC',
         year:'numeric',
@@ -541,14 +530,15 @@ function displayPosts(){
     if(isAdmin){
         container.innerHTML=postsToShow.map(post=>{
             const readTime=calculateReadingTime(post.content);
+            const formattedDate=formatDate(post.created_at);
             return `
             <article class="post-card ${escapeHtml(post.type)}" data-post-id="${post.id}" style="cursor:pointer;" itemscope itemtype="https://schema.org/BlogPosting">
                 <h3 itemprop="headline">${escapeHtml(post.title)}</h3>
-                <p class="post-date">
-                    <time itemprop="datePublished" datetime="${post.created_at||''}">
-                        ${formatDate(post.created_at)}
+                ${formattedDate?`<p class="post-date">
+                    <time itemprop="datePublished" datetime="${post.created_at}">
+                        ${formattedDate}
                     </time>
-                </p>
+                </p>`:''}
                 <span class="reading-time" itemprop="timeRequired" content="PT${readTime}M">${readTime} min read</span>
                 <p class="post-excerpt" itemprop="description">${escapeHtml(post.content.substring(0,150))}${post.content.length>150?'...':''}</p>
                 <meta itemprop="author" content="Ryan">
@@ -567,14 +557,15 @@ function displayPosts(){
         container.innerHTML=postsToShow.map(post=>{
             const readTime=calculateReadingTime(post.content);
             const postUrl=`post.html?id=${post.id}`;
+            const formattedDate=formatDate(post.created_at);
             return `
             <a href="${postUrl}" class="post-card ${escapeHtml(post.type)}" itemscope itemtype="https://schema.org/BlogPosting">
                 <h3 itemprop="headline">${escapeHtml(post.title)}</h3>
-                <p class="post-date">
-                    <time itemprop="datePublished" datetime="${post.created_at||''}">
-                        ${formatDate(post.created_at)}
+                ${formattedDate?`<p class="post-date">
+                    <time itemprop="datePublished" datetime="${post.created_at}">
+                        ${formattedDate}
                     </time>
-                </p>
+                </p>`:''}
                 <span class="reading-time" itemprop="timeRequired" content="PT${readTime}M">${readTime} min read</span>
                 <p class="post-excerpt" itemprop="description">${escapeHtml(post.content.substring(0,150))}${post.content.length>150?'...':''}</p>
                 <meta itemprop="author" content="Ryan">
