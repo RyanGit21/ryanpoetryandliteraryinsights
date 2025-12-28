@@ -600,11 +600,11 @@ function displayPosts(){
             return `
             <article class="post-card ${escapeHtml(post.type)}" data-post-id="${post.id}" style="cursor:pointer;" itemscope itemtype="https://schema.org/BlogPosting">
                 <h3 itemprop="headline">${escapeHtml(post.title)}</h3>
-                ${formattedDate?`<p class="post-date">
-                    <time itemprop="datePublished" datetime="${post.created_at}">
-                        ${formattedDate}
+                <p class="post-date">
+                    <time itemprop="datePublished" datetime="${post.created_at || new Date().toISOString()}">
+                        ${formattedDate || 'Recently'}
                     </time>
-                </p>`:''}
+                </p>
                 <span class="reading-time" itemprop="timeRequired" content="PT${readTime}M">${readTime} min read</span>
                 <p class="post-excerpt" itemprop="description">${escapeHtml(post.content.substring(0,150))}${post.content.length>150?'...':''}</p>
                 <meta itemprop="author" content="Ryan">
@@ -627,11 +627,11 @@ function displayPosts(){
             return `
             <a href="${postUrl}" class="post-card ${escapeHtml(post.type)}" itemscope itemtype="https://schema.org/BlogPosting">
                 <h3 itemprop="headline">${escapeHtml(post.title)}</h3>
-                ${formattedDate?`<p class="post-date">
-                    <time itemprop="datePublished" datetime="${post.created_at}">
-                        ${formattedDate}
+                <p class="post-date">
+                    <time itemprop="datePublished" datetime="${post.created_at || new Date().toISOString()}">
+                        ${formattedDate || 'Recently'}
                     </time>
-                </p>`:''}
+                </p>
                 <span class="reading-time" itemprop="timeRequired" content="PT${readTime}M">${readTime} min read</span>
                 <p class="post-excerpt" itemprop="description">${escapeHtml(post.content.substring(0,150))}${post.content.length>150?'...':''}</p>
                 <meta itemprop="author" content="Ryan">
