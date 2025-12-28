@@ -281,9 +281,9 @@ function escapeHtml(text){
 }
 
 function formatDate(dateString){
-    if(!dateString)return'';
+    if(!dateString)return null;
     const date=new Date(dateString);
-    if(isNaN(date.getTime()))return'';
+    if(isNaN(date.getTime()))return null;
     return date.toLocaleDateString('en-US',{
         timeZone:'UTC',
         year:'numeric',
@@ -417,18 +417,26 @@ async function loadPost(){
         
         currentPostData=post;
         
+        console.log('📅 Post data:', {
+            id: post.id,
+            title: post.title,
+            created_at: post.created_at,
+            has_created_at: !!post.created_at
+        });
+        
         const formattedDate=formatDate(post.created_at);
+        console.log('📅 Formatted date:', formattedDate);
         
         // Render post IMMEDIATELY
         postContainer.innerHTML=`
             <article class="post-content ${post.type}" itemscope itemtype="https://schema.org/BlogPosting">
                 <h1 class="post-title" itemprop="headline">${escapeHtml(post.title)}</h1>
-                ${formattedDate?`<div class="post-meta">
-                    <time itemprop="datePublished" datetime="${post.created_at}">
-                        Published on ${formattedDate}
+                <div class="post-meta">
+                    <time itemprop="datePublished" datetime="${post.created_at || new Date().toISOString()}">
+                        Published on ${formattedDate || 'Recently'}
                     </time>
                     <meta itemprop="author" content="Ryan">
-                </div>`:''}
+                </div>
                 <div class="post-body" itemprop="articleBody">${escapeHtml(post.content)}</div>
             </article>
         `;
