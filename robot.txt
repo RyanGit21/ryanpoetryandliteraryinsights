@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ryangit21.github.io/ryanpoetryandliteraryinsights/sitemap.xml
+Sitemap: https://poeticandliteraryinsights.com/sitemap.xml
