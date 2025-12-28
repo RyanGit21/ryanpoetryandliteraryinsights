@@ -295,6 +295,7 @@ async function loadPost(){
     
     try{
         const CACHE_PREFIX='post_';
+        const CACHE_DURATION = 2*60*60*1000; // 2 hours
         let post=null;
         
         // Clear loading state early for better perceived performance
@@ -305,14 +306,17 @@ async function loadPost(){
             const cached=localStorage.getItem(CACHE_PREFIX+id);
             if(cached){
                 const{data,timestamp}=JSON.parse(cached);
-                if(Date.now()-timestamp<30*60*1000){
+                if(Date.now()-timestamp<CACHE_DURATION){
                     post=data;
                 }
             }
         }catch(e){}
         
         if(!post){
-            const{data,error}=await sb.from('posts').select('*').eq('id',id).single();
+            const{data,error}=await Promise.race([
+                sb.from('posts').select('*').eq('id',id).single(),
+                new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout')),4000))
+            ]);
             if(error)throw error;
             post=data;
             
@@ -361,7 +365,8 @@ async function loadPost(){
         document.getElementById('share-section').style.display='block';
         document.getElementById('comments-section').style.display='block';
         
-        await loadComments();
+        // OPTIMIZATION: Load comments in parallel (don't block post rendering)
+        loadComments();
         
     }catch(err){
         console.error('Error loading post:',err);
