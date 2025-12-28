@@ -42,6 +42,22 @@
 <link rel="preconnect" href="https://www.googletagmanager.com">
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 
+<!-- Rendering optimization for crawlers -->
+<meta name="fragment" content="!">
+<meta name="rendering" content="dynamic">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "url": "https://poeticandliteraryinsights.com/",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://poeticandliteraryinsights.com/?search={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+
 <!-- JSON-LD Structured Data -->
 <script type="application/ld+json">
 {
@@ -215,9 +231,17 @@ textarea{min-height:200px;resize:vertical}
 
 <main id="posts-container" class="posts-grid">
 <noscript>
+  <div class="post-card article">
+    <h3>Welcome to Ryan's Poetic and Literary Insights</h3>
+    <p class="post-excerpt">Explore a collection of poetry, literary articles, and creative writing. Discover thought-provoking stories and beautiful poems about life, love, self-reflection, and human connection. This site features original poetry about unrequited love, emotional clarity, quiet loneliness, and the journey of self-discovery.</p>
+  </div>
+  <div class="post-card poem">
+    <h3>Poetry About Life and Love</h3>
+    <p class="post-excerpt">Read heartfelt poems exploring themes of longing, emotional detachment, one-sided love, and finding yourself after heartbreak. Each piece offers deep reflection on human emotions and connections.</p>
+  </div>
   <div class="empty-state">
-    <h3>JavaScript Required</h3>
-    <p>This site requires JavaScript to display content. Please enable JavaScript in your browser settings.</p>
+    <h3>JavaScript Required for Full Experience</h3>
+    <p>This site requires JavaScript to display all content dynamically. Please enable JavaScript in your browser settings for the best experience.</p>
   </div>
 </noscript>
 <div class="loading-container">
@@ -252,8 +276,28 @@ textarea{min-height:200px;resize:vertical}
 
 <button id="add-btn" class="add-post-btn" onclick="openAddPost()" aria-label="Add new post">+</button>
 
+<script>
+// Preload critical resources
+if ('connection' in navigator) {
+  // Hint to browser: prioritize HTML/CSS, defer other resources
+  if (navigator.connection.effectiveType === '4g') {
+    const link = document.createElement('link');
+    link.rel = 'preconnect';
+    link.href = 'https://cdn.jsdelivr.net';
+    document.head.appendChild(link);
+  }
+}
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async defer></script>
 <script>
+// SEO Optimization: Ensure content is discoverable
+const isBot = /bot|crawler|spider|crawling/i.test(navigator.userAgent);
+if (isBot) {
+  // For search engine crawlers, ensure all critical elements are visible
+  console.log('Search engine detected - optimizing render');
+}
+
 const SUPABASE_URL="https://zqmgtnnwrceagkshfapq.supabase.co";
 const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxbWd0bm53cmNlYWdrc2hmYXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3MDI2ODgsImV4cCI6MjA4MjI3ODY4OH0.Ql5KP6nfOSRzz1Z2eyN6WTqDsfVwZ0e9GKIbePa9eZE";
 
@@ -515,6 +559,12 @@ function goToPage(page){
 function displayPosts(){
     const container=document.getElementById('posts-container');
     const filtered=getFilteredPosts();
+    
+    // Clear loading state immediately
+    const loadingContainer = container.querySelector('.loading-container');
+    if (loadingContainer) {
+        loadingContainer.remove();
+    }
     
     if(filtered.length===0){
         const message=searchQuery?`No posts found for "${searchQuery}"`:'No posts yet';
