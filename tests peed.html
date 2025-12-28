@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Speed Test</title>
+<style>
+body{font-family:Arial;padding:20px;background:#1a1a2e;color:white}
+.log{background:#2a2a3e;padding:10px;margin:5px 0;border-radius:5px}
+.success{color:#2ecc71}
+.error{color:#e74c3c}
+.warn{color:#f39c12}
+</style>
+</head>
+<body>
+<h1>Speed Diagnostic Test</h1>
+<div id="logs"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://zqmgtnnwrceagkshfapq.supabase.co";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxbWd0bm53cmNlYWdrc2hmYXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3MDI2ODgsImV4cCI6MjA4MjI3ODY4OH0.Ql5KP6nfOSRzz1Z2eyN6WTqDsfVwZ0e9GKIbePa9eZE";
+
+function log(msg, type='log'){
+    const div = document.createElement('div');
+    div.className = `log ${type}`;
+    div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+    document.getElementById('logs').appendChild(div);
+    console.log(msg);
+}
+
+async function runTests(){
+    const startTime = Date.now();
+    log('🚀 Starting speed tests...', 'log');
+    
+    // Test 1: Supabase client creation
+    const t1 = Date.now();
+    log('Test 1: Creating Supabase client...', 'log');
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    log(`✅ Client created in ${Date.now()-t1}ms`, 'success');
+    
+    // Test 2: Fetch all posts
+    const t2 = Date.now();
+    log('Test 2: Fetching all posts...', 'log');
+    try{
+        const {data, error} = await sb.from('posts').select('id,title,type,content,created_at').order('created_at',{ascending:false});
+        if(error) throw error;
+        log(`✅ Fetched ${data.length} posts in ${Date.now()-t2}ms`, 'success');
+    }catch(e){
+        log(`❌ Error fetching posts: ${e.message} (took ${Date.now()-t2}ms)`, 'error');
+    }
+    
+    // Test 3: Fetch single post
+    const t3 = Date.now();
+    log('Test 3: Fetching single post (ID=1)...', 'log');
+    try{
+        const {data, error} = await sb.from('posts').select('*').eq('id', 1).single();
+        if(error) throw error;
+        log(`✅ Fetched single post in ${Date.now()-t3}ms`, 'success');
+    }catch(e){
+        log(`❌ Error fetching single post: ${e.message} (took ${Date.now()-t3}ms)`, 'error');
+    }
+    
+    // Test 4: localStorage
+    const t4 = Date.now();
+    log('Test 4: Testing localStorage...', 'log');
+    try{
+        localStorage.setItem('test', 'data');
+        localStorage.getItem('test');
+        localStorage.removeItem('test');
+        log(`✅ localStorage working in ${Date.now()-t4}ms`, 'success');
+    }catch(e){
+        log(`⚠️ localStorage error: ${e.message}`, 'warn');
+    }
+    
+    // Total time
+    log(`\n🏁 Total test time: ${Date.now()-startTime}ms`, 'success');
+    
+    // Recommendation
+    if((Date.now()-startTime) > 3000){
+        log('\n⚠️ SLOW CONNECTION DETECTED', 'warn');
+        log('Your Supabase queries are taking too long.', 'warn');
+        log('Recommendations:', 'warn');
+        log('1. Use caching aggressively', 'warn');
+        log('2. Consider upgrading Supabase tier', 'warn');
+        log('3. Add a CDN in front', 'warn');
+    }else{
+        log('\n✅ Connection is good! Issue is elsewhere.', 'success');
+    }
+}
+
+if(window.supabase){
+    runTests();
+}else{
+    setTimeout(() => {
+        if(window.supabase){
+            runTests();
+        }else{
+            log('❌ Supabase library failed to load!', 'error');
+        }
+    }, 2000);
+}
+</script>
+</body>
+</html>
