@@ -137,6 +137,21 @@ body{font-family:'Georgia',serif;background:linear-gradient(135deg,var(--bg-grad
 </nav>
 
 <main id="post-container">
+<noscript>
+  <article class="post-content">
+    <h1 class="post-title">Poetry and Literary Insights</h1>
+    <div class="post-meta">A collection of poems and articles exploring life, love, and human connection</div>
+    <div class="post-body">
+      Welcome to Ryan's Poetic and Literary Insights. This site features original poetry and literary articles about emotional reflection, unrequited love, self-discovery, and the complexities of human relationships. 
+      
+      Each piece is crafted to resonate with readers seeking depth, authenticity, and emotional clarity through words.
+      
+      Topics include: one-sided love, emotional detachment, quiet loneliness, finding yourself after heartbreak, inner growth, and the beauty of human connection.
+      
+      JavaScript is required to view the full post. Please enable JavaScript for the complete experience.
+    </div>
+  </article>
+</noscript>
 <div class="loading-container">
 <div class="spinner"></div>
 <p>Loading post...</p>
@@ -201,6 +216,9 @@ body{font-family:'Georgia',serif;background:linear-gradient(135deg,var(--bg-grad
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async defer></script>
 <script>
+// SEO Optimization: Detect crawlers and optimize rendering
+const isBot = /bot|crawler|spider|crawling|googlebot|bingbot/i.test(navigator.userAgent);
+
 const SUPABASE_URL="https://zqmgtnnwrceagkshfapq.supabase.co";
 const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxbWd0bm53cmNlYWdrc2hmYXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3MDI2ODgsImV4cCI6MjA4MjI3ODY4OH0.Ql5KP6nfOSRzz1Z2eyN6WTqDsfVwZ0e9GKIbePa9eZE";
 
@@ -279,6 +297,10 @@ async function loadPost(){
         const CACHE_PREFIX='post_';
         let post=null;
         
+        // Clear loading state early for better perceived performance
+        const postContainer=document.getElementById('post-container');
+        const loadingContainer = postContainer.querySelector('.loading-container');
+        
         try{
             const cached=localStorage.getItem(CACHE_PREFIX+id);
             if(cached){
@@ -308,6 +330,13 @@ async function loadPost(){
         const formattedDate=formatDate(post.created_at);
         
         const postContainer=document.getElementById('post-container');
+        
+        // Remove loading state
+        const loadingContainer = postContainer.querySelector('.loading-container');
+        if (loadingContainer) {
+            loadingContainer.remove();
+        }
+        
         postContainer.innerHTML=`
             <article class="post-content ${post.type}" itemscope itemtype="https://schema.org/BlogPosting">
                 <h1 class="post-title" itemprop="headline">${escapeHtml(post.title)}</h1>
