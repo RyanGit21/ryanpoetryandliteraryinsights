@@ -309,8 +309,8 @@ let currentPage=1;
 let searchQuery="";
 const POSTS_PER_PAGE=10;
 
-const CACHE_KEY='blog_posts_cache_v4';
-const CACHE_DURATION=30*60*1000;
+const CACHE_KEY='blog_posts_cache_v5';
+const CACHE_DURATION=2*60*60*1000; // 2 hours instead of 30 minutes
 
 function loadTheme(){
     const theme=localStorage.getItem('theme')||'light';
@@ -362,17 +362,22 @@ function initSupabase(){
 async function loadPosts(){
     try{
         const cachedPosts=getCachedPosts();
-        if(cachedPosts){
+        
+        // OPTIMIZATION: Show cached content IMMEDIATELY
+        if(cachedPosts && cachedPosts.length > 0){
             allPosts=cachedPosts;
             displayPosts();
             injectStructuredData();
+            
+            // Fetch fresh data in background (non-blocking)
             fetchPostsInBackground();
             return;
         }
         
+        // No cache - fetch immediately but with timeout
         const{data,error}=await Promise.race([
             sb.from('posts').select('id,title,type,content,created_at').order('created_at',{ascending:false}),
-            new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout')),8000))
+            new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout')),5000)) // Reduced from 8s to 5s
         ]);
         
         if(error)throw error;
@@ -400,12 +405,22 @@ async function fetchPostsInBackground(){
     try{
         const{data,error}=await sb.from('posts').select('id,title,type,content,created_at').order('created_at',{ascending:false});
         if(!error&&data){
-            allPosts=data;
-            setCachedPosts(allPosts);
-            displayPosts();
-            injectStructuredData();
+            // Only update if data actually changed
+            const currentCache = JSON.stringify(allPosts);
+            const newData = JSON.stringify(data);
+            
+            if(currentCache !== newData) {
+                allPosts=data;
+                setCachedPosts(allPosts);
+                // Silently refresh display without showing loading state
+                displayPosts();
+                injectStructuredData();
+            }
         }
-    }catch(e){}
+    }catch(e){
+        // Silent fail - don't disrupt user experience
+        console.log('Background fetch failed, using cache');
+    }
 }
 
 function injectStructuredData(){
@@ -625,10 +640,28 @@ function displayPosts(){
         `}).join('');
         
         document.querySelectorAll('a[href^="post.html"]').forEach(link=>{
+            // Prefetch on mouseenter
             link.addEventListener('mouseenter',function(){
                 const postId=new URL(this.href,window.location.href).searchParams.get('id');
                 if(postId)prefetchPost(postId);
             },{once:true});
+            
+            // OPTIMIZATION: Also prefetch when link becomes visible (for mobile)
+            if('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if(entry.isIntersecting) {
+                            const postId=new URL(entry.target.href,window.location.href).searchParams.get('id');
+                            if(postId) {
+                                prefetchPost(postId);
+                                observer.unobserve(entry.target);
+                            }
+                        }
+                    });
+                }, { rootMargin: '50px' }); // Start prefetching 50px before visible
+                
+                observer.observe(link);
+            }
         });
     }
     
@@ -637,17 +670,49 @@ function displayPosts(){
 
 function prefetchPost(id){
     const CACHE_PREFIX='post_';
+    const MAX_CACHED_POSTS = 50; // Increased from implicit limit
+    
     try{
         const cached=localStorage.getItem(CACHE_PREFIX+id);
-        if(cached)return;
+        if(cached) {
+            // Already cached, refresh if older than 1 hour
+            const {timestamp} = JSON.parse(cached);
+            if(Date.now() - timestamp < 60*60*1000) {
+                return; // Fresh cache, skip fetch
+            }
+        }
     }catch(e){}
     
+    // Prefetch in background
     sb.from("posts").select("*").eq("id",id).single().then(({data})=>{
         if(data){
             try{
                 localStorage.setItem(CACHE_PREFIX+id,JSON.stringify({data:data,timestamp:Date.now()}));
-            }catch(e){}
+                
+                // Clean old cached posts if we have too many
+                const keys = Object.keys(localStorage).filter(k => k.startsWith(CACHE_PREFIX));
+                if(keys.length > MAX_CACHED_POSTS) {
+                    // Remove oldest
+                    keys.sort((a,b) => {
+                        const aData = JSON.parse(localStorage.getItem(a));
+                        const bData = JSON.parse(localStorage.getItem(b));
+                        return aData.timestamp - bData.timestamp;
+                    });
+                    localStorage.removeItem(keys[0]);
+                }
+            }catch(e){
+                // localStorage full, clear old entries
+                try {
+                    const CACHE_PREFIX='post_';
+                    Object.keys(localStorage)
+                        .filter(k => k.startsWith(CACHE_PREFIX))
+                        .slice(0, 10) // Remove oldest 10
+                        .forEach(k => localStorage.removeItem(k));
+                } catch(e2) {}
+            }
         }
+    }).catch(()=>{
+        // Silent fail for prefetch
     });
 }
 
