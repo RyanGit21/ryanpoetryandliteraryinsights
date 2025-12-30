@@ -133,6 +133,35 @@ body{font-family:'Georgia',serif;background:linear-gradient(135deg,var(--bg-grad
 .nav-label{font-size:0.85em;color:var(--text-muted);text-transform:uppercase;font-weight:bold}
 .nav-title{font-size:1.1em;color:var(--text-primary);font-weight:500;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
+/* ========== NEW: LIKE BUTTON STYLES ========== */
+.like-section{display:flex;align-items:center;gap:15px;margin-top:20px;padding-top:20px;border-top:2px solid var(--border-color)}
+.like-btn{display:inline-flex;align-items:center;gap:10px;padding:12px 24px;background:var(--accent-red);color:white;border:none;border-radius:30px;font-size:1em;font-weight:bold;cursor:pointer;transition:all 0.3s ease;box-shadow:0 3px 10px rgba(255,107,107,0.3)}
+.like-btn:hover{background:#ff5252;transform:translateY(-2px);box-shadow:0 5px 15px rgba(255,107,107,0.4)}
+.like-btn.liked{background:#2ecc71;box-shadow:0 3px 10px rgba(46,204,113,0.3)}
+.like-btn.liked:hover{background:#27ae60;box-shadow:0 5px 15px rgba(46,204,113,0.4)}
+.like-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+.like-icon{font-size:1.3em;transition:transform 0.3s ease}
+.like-btn:hover .like-icon{transform:scale(1.2)}
+.like-btn.liked .like-icon{animation:heartbeat 0.6s ease}
+@keyframes heartbeat{0%,100%{transform:scale(1)}25%{transform:scale(1.3)}50%{transform:scale(1.1)}75%{transform:scale(1.25)}}
+.like-count{font-size:1.1em;color:var(--text-primary);font-weight:bold}
+
+/* ========== NEW: REPLY STYLES ========== */
+.comment-actions{margin-top:15px;display:flex;gap:10px}
+.reply-btn{padding:8px 16px;background:transparent;border:2px solid var(--accent-blue);color:var(--accent-blue);border-radius:20px;cursor:pointer;font-size:0.9em;font-weight:bold;transition:all 0.3s ease}
+.reply-btn:hover{background:var(--accent-blue);color:white}
+.reply-form{margin-top:20px;padding:20px;background:rgba(102,126,234,0.05);border-radius:10px;border-left:3px solid var(--accent-blue)}
+.reply-form.hidden{display:none}
+.reply-form h4{color:var(--accent-blue);margin-bottom:15px;font-size:1em}
+.replies-container{margin-top:20px;padding-left:30px;border-left:3px solid var(--border-color)}
+.reply-item{background:rgba(102,126,234,0.03);padding:20px;border-radius:10px;margin-bottom:15px;border-left:3px solid var(--accent-blue)}
+.reply-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px}
+.reply-author{color:var(--accent-blue);margin:0;font-size:1em;font-weight:bold}
+.reply-date{color:var(--text-muted);font-size:0.85em}
+.reply-content{color:var(--text-primary);line-height:1.6;margin:0;white-space:pre-wrap;word-wrap:break-word;font-size:0.95em}
+.cancel-reply-btn{padding:8px 16px;background:transparent;border:2px solid var(--text-muted);color:var(--text-muted);border-radius:20px;cursor:pointer;font-size:0.9em;transition:all 0.3s ease}
+.cancel-reply-btn:hover{background:var(--text-muted);color:white}
+
 @media(max-width:768px){
     .container{padding:15px}
     .post-content{padding:30px 20px}
@@ -146,6 +175,8 @@ body{font-family:'Georgia',serif;background:linear-gradient(135deg,var(--bg-grad
     .post-navigation{flex-direction:column;gap:15px}
     .nav-post-btn{max-width:100%;padding:15px 20px}
     .nav-title{max-width:200px;font-size:1em}
+    .replies-container{padding-left:15px}
+    .like-section{flex-direction:column;align-items:flex-start;gap:10px}
 }
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
 </style>
@@ -267,6 +298,16 @@ const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI
 let sb;
 let currentPostId=null;
 let currentPostData=null;
+
+// ========== NEW: User identifier for likes ==========
+function getUserIdentifier(){
+    let userId=localStorage.getItem('user_id');
+    if(!userId){
+        userId='user_'+Math.random().toString(36).substr(2,9)+'_'+Date.now();
+        localStorage.setItem('user_id',userId);
+    }
+    return userId;
+}
 
 function loadTheme(){
     const theme=localStorage.getItem('theme')||'light';
@@ -435,7 +476,7 @@ async function loadPost(){
         const formattedDate=formatDate(post.created_at);
         console.log('📅 Formatted date:', formattedDate);
         
-        // Render post IMMEDIATELY
+        // Render post IMMEDIATELY with like button
         postContainer.innerHTML=`
             <article class="post-content ${post.type}" itemscope itemtype="https://schema.org/BlogPosting">
                 <h1 class="post-title" itemprop="headline">${escapeHtml(post.title)}</h1>
@@ -446,6 +487,15 @@ async function loadPost(){
                     <meta itemprop="author" content="Ryan">
                 </div>
                 <div class="post-body" itemprop="articleBody">${escapeHtml(post.content)}</div>
+                
+                <!-- NEW: Like Section -->
+                <div class="like-section">
+                    <button id="like-btn" class="like-btn" onclick="toggleLike()" disabled>
+                        <span class="like-icon">❤️</span>
+                        <span id="like-btn-text">Like</span>
+                    </button>
+                    <span class="like-count"><span id="like-count">0</span> likes</span>
+                </div>
             </article>
         `;
         
@@ -460,7 +510,8 @@ async function loadPost(){
         document.getElementById('share-section').style.display='block';
         document.getElementById('comments-section').style.display='block';
         
-        // OPTIMIZATION: Load comments and navigation in parallel (don't block post rendering)
+        // OPTIMIZATION: Load likes, comments and navigation in parallel
+        loadLikes();
         loadComments();
         loadPostNavigation();
         
@@ -477,10 +528,116 @@ async function loadPost(){
     }
 }
 
+// ========== NEW: LIKE FUNCTIONALITY ==========
+async function loadLikes(){
+    if(!currentPostId)return;
+    
+    try{
+        // Get total like count
+        const{count,error}=await sb
+            .from('post_likes')
+            .select('*',{count:'exact',head:true})
+            .eq('post_id',currentPostId);
+        
+        if(error)throw error;
+        
+        document.getElementById('like-count').textContent=count||0;
+        
+        // Check if current user has liked
+        const userId=getUserIdentifier();
+        const{data:userLike,error:userError}=await sb
+            .from('post_likes')
+            .select('*')
+            .eq('post_id',currentPostId)
+            .eq('user_identifier',userId)
+            .maybeSingle();
+        
+        if(userError)throw userError;
+        
+        const likeBtn=document.getElementById('like-btn');
+        const likeBtnText=document.getElementById('like-btn-text');
+        
+        if(userLike){
+            likeBtn.classList.add('liked');
+            likeBtnText.textContent='Liked';
+        }
+        
+        likeBtn.disabled=false;
+        
+    }catch(err){
+        console.error('Error loading likes:',err);
+        document.getElementById('like-count').textContent='0';
+        document.getElementById('like-btn').disabled=false;
+    }
+}
+
+async function toggleLike(){
+    if(!currentPostId)return;
+    
+    const likeBtn=document.getElementById('like-btn');
+    const likeBtnText=document.getElementById('like-btn-text');
+    const likeCountEl=document.getElementById('like-count');
+    
+    likeBtn.disabled=true;
+    
+    try{
+        const userId=getUserIdentifier();
+        
+        // Check if already liked
+        const{data:existingLike,error:checkError}=await sb
+            .from('post_likes')
+            .select('*')
+            .eq('post_id',currentPostId)
+            .eq('user_identifier',userId)
+            .maybeSingle();
+        
+        if(checkError)throw checkError;
+        
+        if(existingLike){
+            // Unlike
+            const{error:deleteError}=await sb
+                .from('post_likes')
+                .delete()
+                .eq('post_id',currentPostId)
+                .eq('user_identifier',userId);
+            
+            if(deleteError)throw deleteError;
+            
+            likeBtn.classList.remove('liked');
+            likeBtnText.textContent='Like';
+            likeCountEl.textContent=parseInt(likeCountEl.textContent)-1;
+            showMessage('Removed like','success');
+        }else{
+            // Like
+            const{error:insertError}=await sb
+                .from('post_likes')
+                .insert([{
+                    post_id:currentPostId,
+                    user_identifier:userId
+                }]);
+            
+            if(insertError)throw insertError;
+            
+            likeBtn.classList.add('liked');
+            likeBtnText.textContent='Liked';
+            likeCountEl.textContent=parseInt(likeCountEl.textContent)+1;
+            showMessage('Thank you for liking this post!','success');
+        }
+        
+    }catch(err){
+        console.error('Error toggling like:',err);
+        showMessage('Error updating like: '+err.message,'error');
+    }finally{
+        likeBtn.disabled=false;
+    }
+}
+
+// ========== MODIFIED: COMMENTS WITH REPLIES ==========
 async function loadComments(){
     if(!currentPostId)return;
     
     try{
+        // Fetch all comments (parents and replies)
         const{data,error}=await sb
             .from('comments')
             .select('*')
@@ -496,8 +653,14 @@ async function loadComments(){
             return;
         }
         
-        commentsList.innerHTML=data.map(comment=>{
+        // Separate parent comments and replies
+        const parentComments=data.filter(c=>!c.parent_comment_id);
+        const replies=data.filter(c=>c.parent_comment_id);
+        
+        // Build comment tree
+        commentsList.innerHTML=parentComments.map(comment=>{
             const formattedDate=formatCommentDate(comment.created_at);
+            const commentReplies=replies.filter(r=>r.parent_comment_id===comment.id);
             
             return `
                 <div class="comment-item">
@@ -506,6 +669,41 @@ async function loadComments(){
                         <span class="comment-date">${formattedDate}</span>
                     </div>
                     <p class="comment-content">${escapeHtml(comment.content)}</p>
+                    
+                    <!-- NEW: Reply button -->
+                    <div class="comment-actions">
+                        <button class="reply-btn" onclick="showReplyForm(${comment.id})">Reply</button>
+                    </div>
+                    
+                    <!-- NEW: Reply form -->
+                    <div id="reply-form-${comment.id}" class="reply-form hidden">
+                        <h4>Reply to ${escapeHtml(comment.author_name)}</h4>
+                        <div class="form-group">
+                            <label for="reply-name-${comment.id}">Your Name:</label>
+                            <input type="text" id="reply-name-${comment.id}" placeholder="Your name" maxlength="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="reply-content-${comment.id}">Your Reply:</label>
+                            <textarea id="reply-content-${comment.id}" placeholder="Write your reply..." maxlength="1000"></textarea>
+                        </div>
+                        <button class="submit-btn" onclick="submitReply(${comment.id})">Post Reply</button>
+                        <button class="cancel-reply-btn" onclick="hideReplyForm(${comment.id})">Cancel</button>
+                    </div>
+                    
+                    <!-- NEW: Replies container -->
+                    ${commentReplies.length>0?`
+                        <div class="replies-container">
+                            ${commentReplies.map(reply=>`
+                                <div class="reply-item">
+                                    <div class="reply-header">
+                                        <h5 class="reply-author">${escapeHtml(reply.author_name)}</h5>
+                                        <span class="reply-date">${formatCommentDate(reply.created_at)}</span>
+                                    </div>
+                                    <p class="reply-content">${escapeHtml(reply.content)}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `:''}
                 </div>
             `;
         }).join('');
@@ -514,6 +712,80 @@ async function loadComments(){
         console.error('Error loading comments:',err);
         document.getElementById('comments-list').innerHTML=
             '<div class="comments-error">Error loading comments. Please try again later.</div>';
+    }
+}
+
+// ========== NEW: REPLY FUNCTIONS ==========
+function showReplyForm(commentId){
+    // Hide all other reply forms
+    document.querySelectorAll('.reply-form').forEach(form=>{
+        form.classList.add('hidden');
+    });
+    
+    // Show this reply form
+    const form=document.getElementById(`reply-form-${commentId}`);
+    form.classList.remove('hidden');
+    
+    // Focus on name input
+    document.getElementById(`reply-name-${commentId}`).focus();
+}
+
+function hideReplyForm(commentId){
+    const form=document.getElementById(`reply-form-${commentId}`);
+    form.classList.add('hidden');
+    
+    // Clear inputs
+    document.getElementById(`reply-name-${commentId}`).value='';
+    document.getElementById(`reply-content-${commentId}`).value='';
+}
+
+async function submitReply(parentCommentId){
+    const nameInput=document.getElementById(`reply-name-${parentCommentId}`);
+    const contentInput=document.getElementById(`reply-content-${parentCommentId}`);
+    
+    const name=nameInput.value.trim();
+    const content=contentInput.value.trim();
+    
+    if(!name||!content){
+        showMessage('Please fill in all fields','error');
+        return;
+    }
+    
+    if(name.length>100){
+        showMessage('Name is too long (max 100 characters)','error');
+        return;
+    }
+    
+    if(content.length>1000){
+        showMessage('Reply is too long (max 1000 characters)','error');
+        return;
+    }
+    
+    if(!currentPostId){
+        showMessage('Post ID not found','error');
+        return;
+    }
+    
+    try{
+        const{error}=await sb
+            .from('comments')
+            .insert([{
+                post_id:currentPostId,
+                parent_comment_id:parentCommentId,
+                author_name:name,
+                content:content
+            }]);
+        
+        if(error)throw error;
+        
+        hideReplyForm(parentCommentId);
+        showMessage('Reply posted successfully!','success');
+        
+        await loadComments();
+        
+    }catch(err){
+        console.error('Error posting reply:',err);
+        showMessage('Error posting reply: '+err.message,'error');
     }
 }
 
