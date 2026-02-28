@@ -805,6 +805,82 @@ body::before {
 }
 
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+/* ── PRINT CSS ── */
+@media print {
+  #reading-progress, .theme-toggle, .breadcrumb, .share-section,
+  .post-navigation, .back-btn, .comments-section, .like-section { display: none !important; }
+  body { background: #fff; color: #000; }
+  body::before { display: none; }
+  .post-content {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    background: #fff;
+  }
+  .post-title { color: #000; font-size: 2rem; }
+  .post-meta { color: #555; border-bottom: 1px solid #ccc; }
+  .post-body { font-size: 1rem; color: #000; }
+  .post-content.poem .post-body { text-align: center; }
+}
+
+/* ── FOCUS MODE ── */
+.focus-btn {
+  position: fixed;
+  top: 20px;
+  right: 78px;
+  width: 48px;
+  height: 48px;
+  background: var(--parchment-card);
+  border: 1.5px solid var(--gold);
+  color: var(--ink);
+  cursor: pointer;
+  border-radius: 50%;
+  z-index: 200;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  box-shadow: 0 2px 12px var(--shadow-soft);
+}
+.focus-btn:hover { border-color: var(--accent); transform: scale(1.05); }
+
+body.focus-mode .breadcrumb,
+body.focus-mode .share-section,
+body.focus-mode .post-navigation,
+body.focus-mode .back-btn,
+body.focus-mode .comments-section,
+body.focus-mode .like-section,
+body.focus-mode #reading-progress { opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+body.focus-mode .post-content { box-shadow: none; border-color: transparent; transition: all 0.5s ease; }
+body:not(.focus-mode) .breadcrumb,
+body:not(.focus-mode) .share-section,
+body:not(.focus-mode) .post-navigation,
+body:not(.focus-mode) .back-btn,
+body:not(.focus-mode) .comments-section,
+body:not(.focus-mode) .like-section { transition: opacity 0.5s ease; }
+
+/* ── SELECTION SHARE ── */
+#selection-tooltip {
+  position: fixed;
+  display: none;
+  background: var(--ink);
+  color: var(--parchment);
+  padding: 8px 16px;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  z-index: 4000;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  white-space: nowrap;
+  pointer-events: auto;
+  border: 1px solid var(--gold);
+  transform: translateX(-50%);
+}
+#selection-tooltip:hover { background: var(--accent); }
 </style>
 </head>
 <body>
@@ -813,6 +889,8 @@ body::before {
 <div id="reading-progress"></div>
 
 <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
+<button class="focus-btn" onclick="toggleFocus()" aria-label="Toggle focus mode" title="Focus mode">⊙</button>
+<div id="selection-tooltip" onclick="shareSelection()">✦ Share this line</div>
 
 <div class="container">
 
@@ -1400,6 +1478,46 @@ function showMessage(text,type){
     document.body.appendChild(msg);
     setTimeout(()=>msg.remove(),3000);
 }
+
+// ── FOCUS MODE ──
+function toggleFocus(){
+    document.body.classList.toggle('focus-mode');
+    document.querySelector('.focus-btn').textContent=
+        document.body.classList.contains('focus-mode') ? '⊗' : '⊙';
+}
+
+// ── SELECTION SHARE ──
+(function(){
+    const tooltip=document.getElementById('selection-tooltip');
+    let _sel='';
+    document.addEventListener('mouseup',function(e){
+        if(e.target===tooltip||tooltip.contains(e.target))return;
+        const sel=window.getSelection();
+        const text=sel?sel.toString().trim():'';
+        if(text.length>3&&text.length<280){
+            _sel=text;
+            const range=sel.getRangeAt(0);
+            const rect=range.getBoundingClientRect();
+            tooltip.style.display='block';
+            tooltip.style.top=(rect.top+window.scrollY-44)+'px';
+            tooltip.style.left=(rect.left+rect.width/2+window.scrollX)+'px';
+        }else{
+            tooltip.style.display='none';
+            _sel='';
+        }
+    });
+    document.addEventListener('mousedown',function(e){
+        if(e.target===tooltip||tooltip.contains(e.target))return;
+        tooltip.style.display='none';
+    });
+    window.shareSelection=function(){
+        if(!_sel)return;
+        const url=encodeURIComponent(window.location.href);
+        const text=encodeURIComponent('\u201c'+_sel+'\u201d');
+        window.open('https://twitter.com/intent/tweet?text='+text+'%0A%0A'+url,'_blank','width=600,height=400');
+        tooltip.style.display='none';
+    };
+})();
 
 // ── CURLY QUOTES ──
 function applyCurlyQuotes(el){
