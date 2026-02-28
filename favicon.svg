@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Background: ink dark -->
+  <rect width="64" height="64" fill="#2a1f0e" rx="8"/>
+
+  <!-- Decorative gold border line top -->
+  <rect x="6" y="6" width="52" height="2" fill="#c8a97e" opacity="0.6" rx="1"/>
+  <!-- Decorative gold border line bottom -->
+  <rect x="6" y="56" width="52" height="2" fill="#c8a97e" opacity="0.6" rx="1"/>
+
+  <!-- Letter R in Playfair-style serif — drawn as paths -->
+  <!-- Using a clean geometric R centered in the mark -->
+  <text
+    x="32"
+    y="45"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="36"
+    font-weight="700"
+    font-style="italic"
+    fill="#c8a97e"
+    text-anchor="middle"
+    dominant-baseline="auto"
+    letter-spacing="-1"
+  >R</text>
+</svg>
