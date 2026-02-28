@@ -18,6 +18,25 @@
 <meta name="author" content="Ryan">
 <meta name="robots" content="index, follow">
 
+<link rel="canonical" href="https://poeticandliteraryinsights.com/post.html">
+
+<!-- Open Graph -->
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Ryan's Poetic and Literary Insights">
+<meta property="og:url" content="https://poeticandliteraryinsights.com/post.html">
+<meta property="og:title" content="Post - Ryan's Poetic and Literary Insights">
+<meta property="og:description" content="Read the full post on Ryan's Poetic and Literary Insights">
+<meta property="og:image" content="https://poeticandliteraryinsights.com/favicon-512x512.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@ryan">
+<meta name="twitter:title" content="Post - Ryan's Poetic and Literary Insights">
+<meta name="twitter:description" content="Read the full post on Ryan's Poetic and Literary Insights">
+<meta name="twitter:image" content="https://poeticandliteraryinsights.com/favicon-512x512.png">
+
 <!-- Favicon Links -->
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -1199,8 +1218,17 @@ async function loadPost(){
         `;
 
         document.title=`${post.title} - Ryan's Poetic and Literary Insights`;
-        const metaDesc=document.querySelector('meta[name="description"]');
-        if(metaDesc) metaDesc.setAttribute('content',post.content.substring(0,150)+'...');
+        const postUrl=`https://poeticandliteraryinsights.com/post.html?id=${post.id}`;
+        const postDesc=post.content.substring(0,150).replace(/\n/g,' ')+'...';
+
+        const setMeta=(sel,attr,val)=>{ const el=document.querySelector(sel); if(el) el.setAttribute(attr,val); };
+        setMeta('meta[name="description"]',        'content', postDesc);
+        setMeta('link[rel="canonical"]',           'href',    postUrl);
+        setMeta('meta[property="og:url"]',         'content', postUrl);
+        setMeta('meta[property="og:title"]',       'content', post.title+' - Ryan\'s Poetic and Literary Insights');
+        setMeta('meta[property="og:description"]', 'content', postDesc);
+        setMeta('meta[name="twitter:title"]',      'content', post.title+' - Ryan\'s Poetic and Literary Insights');
+        setMeta('meta[name="twitter:description"]','content', postDesc);
 
         document.getElementById('back-btn').style.display='inline-block';
         document.getElementById('share-section').style.display='block';
