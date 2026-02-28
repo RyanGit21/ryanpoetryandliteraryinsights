@@ -844,7 +844,162 @@ body::before {
 }
 
 /* ── FOCUS MODE ── */
-.focus-btn {
+/* ── READ TO ME ── */
+.read-btn {
+  position: fixed;
+  top: 20px;
+  right: 136px;
+  width: 48px;
+  height: 48px;
+  background: var(--parchment-card);
+  border: 1.5px solid var(--gold);
+  color: var(--ink);
+  cursor: pointer;
+  border-radius: 50%;
+  z-index: 200;
+  transition: all 0.3s ease;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  box-shadow: 0 2px 12px var(--shadow-soft);
+}
+.read-btn:hover { border-color: var(--accent); transform: scale(1.05); }
+.read-btn.speaking { border-color: var(--accent); background: var(--accent); color: var(--parchment); }
+
+.tts-player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--ink);
+  border-top: 1px solid rgba(200,169,126,0.25);
+  padding: 14px 28px;
+  display: none;
+  align-items: center;
+  gap: 20px;
+  z-index: 300;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.3);
+}
+.tts-player.active { display: flex; }
+
+.tts-controls { display: flex; align-items: center; gap: 12px; }
+
+.tts-play-pause {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none;
+  color: var(--parchment);
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+.tts-play-pause:hover { background: var(--accent-hover); }
+
+.tts-stop {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1.5px solid rgba(200,169,126,0.4);
+  color: var(--parchment);
+  cursor: pointer;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+.tts-stop:hover { border-color: var(--gold); }
+
+.tts-info { flex: 1; min-width: 0; }
+
+.tts-title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--gold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tts-status {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(200,169,126,0.5);
+  margin-top: 3px;
+}
+
+.tts-speed {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  color: rgba(200,169,126,0.6);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.tts-speed-btn {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid rgba(200,169,126,0.3);
+  color: rgba(200,169,126,0.7);
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  transition: all 0.2s ease;
+  border-radius: 0;
+}
+.tts-speed-btn:hover { border-color: var(--gold); color: var(--gold); }
+.tts-speed-btn.active { border-color: var(--accent); color: var(--accent); }
+
+.tts-voice-select {
+  background: transparent;
+  border: 1px solid rgba(200,169,126,0.3);
+  color: rgba(200,169,126,0.7);
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  padding: 4px 8px;
+  cursor: pointer;
+  max-width: 140px;
+  border-radius: 0;
+}
+.tts-voice-select option { background: #2a1f0e; color: #e8dcc8; }
+
+.tts-close {
+  background: transparent;
+  border: none;
+  color: rgba(200,169,126,0.4);
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 4px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+.tts-close:hover { color: var(--gold); }
+
+@media (max-width: 768px) {
+  .read-btn { right: 136px; top: 12px; }
+  .tts-player { padding: 12px 16px; gap: 12px; }
+  .tts-voice-select { display: none; }
+  .tts-speed { gap: 6px; }
+}
+
+/* ── END READ TO ME ── */
   position: fixed;
   top: 20px;
   right: 78px;
@@ -909,7 +1064,29 @@ body:not(.focus-mode) .like-section { transition: opacity 0.5s ease; }
 
 <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
 <button class="focus-btn" onclick="toggleFocus()" aria-label="Toggle focus mode" title="Focus mode">⊙</button>
+<button class="read-btn" id="read-btn" onclick="toggleReading()" aria-label="Read aloud" title="Read to me">▶</button>
 <div id="selection-tooltip" onclick="shareSelection()">✦ Share this line</div>
+
+<!-- TTS Player Bar -->
+<div class="tts-player" id="tts-player">
+  <div class="tts-controls">
+    <button class="tts-play-pause" id="tts-play-pause" onclick="togglePause()">⏸</button>
+    <button class="tts-stop" onclick="stopReading()">■</button>
+  </div>
+  <div class="tts-info">
+    <div class="tts-title" id="tts-post-title">—</div>
+    <div class="tts-status" id="tts-status">Reading...</div>
+  </div>
+  <div class="tts-speed">
+    Speed:
+    <button class="tts-speed-btn" onclick="setSpeed(0.75)" data-speed="0.75">0.75×</button>
+    <button class="tts-speed-btn active" onclick="setSpeed(0.9)" data-speed="0.9">0.9×</button>
+    <button class="tts-speed-btn" onclick="setSpeed(1)" data-speed="1">1×</button>
+    <button class="tts-speed-btn" onclick="setSpeed(1.25)" data-speed="1.25">1.25×</button>
+  </div>
+  <select class="tts-voice-select" id="tts-voice-select" onchange="setVoice(this.value)" aria-label="Select voice"></select>
+  <button class="tts-close" onclick="stopReading()" aria-label="Close player">✕</button>
+</div>
 
 <div class="container">
 
@@ -1235,6 +1412,7 @@ async function loadPost(){
         document.getElementById('comments-section').style.display='block';
 
         applyCurlyQuotes(document.querySelector('.post-body'));
+        window.initReadBtn&&window.initReadBtn();
         loadLikes();
         loadComments();
         loadPostNavigation();
@@ -1506,6 +1684,126 @@ function showMessage(text,type){
     document.body.appendChild(msg);
     setTimeout(()=>msg.remove(),3000);
 }
+
+// ── READ TO ME ──
+(function(){
+    let utterance=null;
+    let paused=false;
+    let currentSpeed=0.9;
+    let currentVoice=null;
+    let voices=[];
+
+    function getVoices(){
+        voices=window.speechSynthesis.getVoices();
+        const sel=document.getElementById('tts-voice-select');
+        if(!sel||!voices.length)return;
+        sel.innerHTML='';
+        voices.forEach((v,i)=>{
+            const opt=document.createElement('option');
+            opt.value=i;
+            opt.textContent=v.name.replace(/Google |Microsoft |Apple /,'').substring(0,22);
+            if(v.lang.startsWith('en'))sel.appendChild(opt);
+        });
+        // prefer a natural English voice
+        const preferred=['Samantha','Daniel','Karen','Moira','Fiona','Google UK English Female','Google US English'];
+        for(const name of preferred){
+            const idx=voices.findIndex(v=>v.name.includes(name));
+            if(idx>-1){ sel.value=idx; currentVoice=voices[idx]; break; }
+        }
+        if(!currentVoice&&voices.length) currentVoice=voices[0];
+    }
+
+    window.speechSynthesis.onvoiceschanged=getVoices;
+    getVoices();
+
+    window.toggleReading=function(){
+        if(!('speechSynthesis' in window)){
+            showMessage('Your browser does not support text-to-speech','error'); return;
+        }
+        if(window.speechSynthesis.speaking||window.speechSynthesis.paused){
+            stopReading(); return;
+        }
+        const postBody=document.querySelector('.post-body');
+        const postTitle=document.querySelector('.post-title');
+        if(!postBody){ showMessage('No content to read','error'); return; }
+
+        const text=(postTitle?postTitle.textContent+'. \n\n':'')+postBody.textContent;
+        utterance=new SpeechSynthesisUtterance(text);
+        utterance.rate=currentSpeed;
+        utterance.pitch=1;
+        if(currentVoice) utterance.voice=currentVoice;
+
+        utterance.onstart=function(){
+            document.getElementById('tts-player').classList.add('active');
+            document.getElementById('tts-play-pause').textContent='⏸';
+            document.getElementById('tts-post-title').textContent=postTitle?postTitle.textContent:'Reading...';
+            document.getElementById('tts-status').textContent='Reading...';
+            document.getElementById('read-btn').classList.add('speaking');
+            document.getElementById('read-btn').textContent='■';
+            paused=false;
+        };
+        utterance.onend=function(){
+            document.getElementById('tts-player').classList.remove('active');
+            document.getElementById('read-btn').classList.remove('speaking');
+            document.getElementById('read-btn').textContent='▶';
+            document.getElementById('tts-status').textContent='Done';
+            paused=false;
+        };
+        utterance.onerror=function(){ stopReading(); };
+
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utterance);
+    };
+
+    window.togglePause=function(){
+        if(!window.speechSynthesis.speaking&&!window.speechSynthesis.paused)return;
+        if(window.speechSynthesis.paused){
+            window.speechSynthesis.resume();
+            document.getElementById('tts-play-pause').textContent='⏸';
+            document.getElementById('tts-status').textContent='Reading...';
+            paused=false;
+        }else{
+            window.speechSynthesis.pause();
+            document.getElementById('tts-play-pause').textContent='▶';
+            document.getElementById('tts-status').textContent='Paused';
+            paused=true;
+        }
+    };
+
+    window.stopReading=function(){
+        window.speechSynthesis.cancel();
+        document.getElementById('tts-player').classList.remove('active');
+        document.getElementById('read-btn').classList.remove('speaking');
+        document.getElementById('read-btn').textContent='▶';
+        paused=false;
+    };
+
+    window.setSpeed=function(speed){
+        currentSpeed=speed;
+        document.querySelectorAll('.tts-speed-btn').forEach(b=>{
+            b.classList.toggle('active',parseFloat(b.dataset.speed)===speed);
+        });
+        // restart with new speed if already speaking
+        if(window.speechSynthesis.speaking||window.speechSynthesis.paused){
+            stopReading();
+            setTimeout(()=>window.toggleReading(),100);
+        }
+    };
+
+    window.setVoice=function(idx){
+        currentVoice=voices[parseInt(idx)]||null;
+        if(window.speechSynthesis.speaking||window.speechSynthesis.paused){
+            stopReading();
+            setTimeout(()=>window.toggleReading(),100);
+        }
+    };
+
+    // show read button once post is loaded — called after render
+    window.initReadBtn=function(){
+        const btn=document.getElementById('read-btn');
+        if(btn) btn.style.display='flex';
+    };
+})();
 
 // ── FOCUS MODE ──
 function toggleFocus(){
