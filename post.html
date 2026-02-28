@@ -831,7 +831,7 @@ body::before {
     </div>
   </div>
 
-  <!-- Previous/Next Post Navigation (skeleton placeholders prevent layout shift) -->
+  <!-- Previous/Next Post Navigation -->
   <div id="post-navigation" class="post-navigation" style="display:none">
     <a href="#" id="prev-post-btn" class="nav-post-btn prev-btn" style="display:none">
       <span class="nav-arrow">←</span>
@@ -876,12 +876,55 @@ body::before {
 
 </div><!-- /.container -->
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async defer></script>
 <script>
-const isBot = /bot|crawler|spider|crawling|googlebot|bingbot/i.test(navigator.userAgent);
+// ── INLINE SUPABASE-COMPATIBLE FETCH CLIENT ──
+// No CDN dependency — uses native fetch for instant loading
+function createClient(url, key) {
+  const baseH = {'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'};
+  class Q {
+    constructor(t){this.t=t;this.p=[];this.rh={...baseH};this.m='GET';this.b=null;this.cnt=false;this.sing=false;this.maybe=false;this._s='*';}
+    select(c,o={}){this._s=c||'*';if(o.count==='exact'){this.cnt=true;this.rh['Prefer']='count=exact';}return this;}
+    eq(c,v){this.p.push(c+'=eq.'+encodeURIComponent(v));return this;}
+    order(c,{ascending:a=true}={}){this.p.push('order='+c+'.'+(a?'asc':'desc'));return this;}
+    single(){this.sing=true;this.rh['Accept']='application/vnd.pgrst.object+json';return this;}
+    maybeSingle(){this.maybe=true;return this;}
+    insert(r){this.m='POST';this.b=JSON.stringify(Array.isArray(r)?r[0]:r);this.rh['Prefer']='return=minimal';return this;}
+    delete(){this.m='DELETE';return this;}
+    update(d){this.m='PATCH';this.b=JSON.stringify(d);this.rh['Prefer']='return=minimal';return this;}
+    then(res){
+      const qs=[...this.p];
+      if(this.m==='GET')qs.unshift('select='+this._s);
+      const fu=url+'/rest/v1/'+this.t+(qs.length?'?'+qs.join('&'):'');
+      const fo={method:this.cnt?'HEAD':this.m,headers:this.rh};
+      if(this.b)fo.body=this.b;
+      fetch(fu,fo).then(async r=>{
+        if(this.cnt){const cr=r.headers.get('Content-Range')||'/0';return res({count:parseInt(cr.split('/').pop())||0,error:null});}
+        if(this.m!=='GET')return res({data:null,error:r.ok?null:new Error(await r.text())});
+        if(!r.ok){if((this.maybe||this.sing)&&r.status===406)return res({data:null,error:null});return res({data:null,error:new Error(await r.text())});}
+        const d=await r.json();
+        if(this.sing)return res({data:d,error:null});
+        if(this.maybe)return res({data:Array.isArray(d)?d[0]??null:d,error:null});
+        return res({data:d,error:null});
+      }).catch(e=>res({data:null,error:e}));
+    }
+  }
+  return {
+    from:t=>new Q(t),
+    auth:{
+      signInWithPassword:async({email:e,password:pw})=>{
+        const r=await fetch(url+'/auth/v1/token?grant_type=password',{method:'POST',headers:baseH,body:JSON.stringify({email:e,password:pw})});
+        const d=await r.json();
+        if(!r.ok)throw{message:d.error_description||d.msg||'Login failed'};
+        return{data:d,error:null};
+      }
+    }
+  };
+}
 
 const SUPABASE_URL="https://zqmgtnnwrceagkshfapq.supabase.co";
 const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxbWd0bm53cmNlYWdrc2hmYXBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3MDI2ODgsImV4cCI6MjA4MjI3ODY4OH0.Ql5KP6nfOSRzz1Z2eyN6WTqDsfVwZ0e9GKIbePa9eZE";
+
+const isBot = /bot|crawler|spider|crawling|googlebot|bingbot/i.test(navigator.userAgent);
 
 let sb;
 let currentPostId=null;
@@ -956,12 +999,8 @@ function calculateReadingTime(text){
 }
 
 function initSupabase(){
-    if(window.supabase){
-        sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-        loadPost();
-    }else{
-        setTimeout(initSupabase,100);
-    }
+    sb=createClient(SUPABASE_URL,SUPABASE_KEY);
+    loadPost();
 }
 
 async function loadPost(){
@@ -1002,7 +1041,7 @@ async function loadPost(){
             try{
                 const{data,error}=await Promise.race([
                     sb.from('posts').select('*').eq('id',id).single(),
-                    new Promise((_,reject)=>setTimeout(()=>reject(new Error('Network timeout after 3 seconds')),3000))
+                    new Promise((_,reject)=>setTimeout(()=>reject(new Error('Network timeout after 8 seconds')),8000))
                 ]);
                 if(error)throw error;
                 post=data;
