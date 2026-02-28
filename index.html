@@ -751,6 +751,177 @@ footer a:hover { opacity: 0.7; }
 /* ── NOSCRIPT ── */
 noscript .post-card { border-left-color: var(--accent); }
 
+/* ── ABOUT SECTION ── */
+.about-strip {
+  background: var(--ink);
+  color: var(--parchment);
+  padding: 48px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Faint Kafka/Nietzsche decorative text behind */
+.about-strip::before {
+  content: 'K  N';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--serif);
+  font-size: 14rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.025);
+  letter-spacing: 6rem;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.about-inner {
+  max-width: 640px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.about-ornament {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  color: var(--gold);
+  letter-spacing: 0.4em;
+  margin-bottom: 18px;
+  display: block;
+  opacity: 0.7;
+}
+
+.about-name {
+  font-family: var(--serif);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--parchment);
+  letter-spacing: 0.02em;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.about-name strong {
+  font-weight: 700;
+  font-style: normal;
+  color: var(--gold);
+}
+
+.about-bio {
+  font-family: var(--body);
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: rgba(232,220,200,0.72);
+  font-style: italic;
+  margin-bottom: 22px;
+}
+
+.about-inspirations {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.65;
+}
+.about-inspirations::before,
+.about-inspirations::after {
+  content: '—';
+  opacity: 0.4;
+}
+
+/* ── SECTION DIVIDER ── */
+.ornament-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 28px 24px 0;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+.ornament-divider::before,
+.ornament-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.35;
+}
+.ornament-divider span {
+  font-family: var(--serif);
+  font-size: 1rem;
+  color: var(--gold);
+  opacity: 0.5;
+  letter-spacing: 0.2em;
+}
+
+/* ── CARD STAGGERED ENTRANCE ── */
+@keyframes cardEnter {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.post-card {
+  animation: cardEnter 0.45s ease both;
+}
+.posts-grid .post-card:nth-child(1)  { animation-delay: 0.04s; }
+.posts-grid .post-card:nth-child(2)  { animation-delay: 0.09s; }
+.posts-grid .post-card:nth-child(3)  { animation-delay: 0.14s; }
+.posts-grid .post-card:nth-child(4)  { animation-delay: 0.18s; }
+.posts-grid .post-card:nth-child(5)  { animation-delay: 0.22s; }
+.posts-grid .post-card:nth-child(6)  { animation-delay: 0.26s; }
+.posts-grid .post-card:nth-child(7)  { animation-delay: 0.30s; }
+.posts-grid .post-card:nth-child(8)  { animation-delay: 0.34s; }
+.posts-grid .post-card:nth-child(9)  { animation-delay: 0.37s; }
+.posts-grid .post-card:nth-child(10) { animation-delay: 0.40s; }
+
+/* ── POEM TYPE BADGE ── */
+.post-type-badge {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border: 1px solid currentColor;
+  margin-bottom: 10px;
+  border-radius: 0;
+}
+.post-card.poem   .post-type-badge { color: var(--poem-border); }
+.post-card.article .post-type-badge { color: var(--accent); }
+
+/* ── HEADER TITLE ACCENT ── */
+header h1 span.title-accent {
+  position: relative;
+  display: inline-block;
+}
+header h1 span.title-accent::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--gold);
+  opacity: 0.4;
+  transform: scaleX(0.6);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+header:hover h1 span.title-accent::after {
+  transform: scaleX(1);
+}
+
+/* ── ABOUT DARK MODE ADJUSTMENTS ── */
+[data-theme="dark"] .about-strip { background: #0f0a05; }
+
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
   header { padding: 60px 20px 44px; }
@@ -763,6 +934,8 @@ noscript .post-card { border-left-color: var(--accent); }
   .add-post-btn { bottom: 20px; right: 20px; }
   .admin-btn { top: 80px; right: 20px; font-size: 0.65rem; padding: 8px 14px; }
   .pagination { gap: 8px; }
+  .about-strip { padding: 36px 20px; }
+  .about-strip::before { font-size: 6rem; letter-spacing: 3rem; }
 }
 </style>
 </head>
@@ -773,9 +946,29 @@ noscript .post-card { border-left-color: var(--accent); }
 <div class="container">
 
 <header itemscope itemtype="https://schema.org/WPHeader">
-  <h1 itemprop="headline">Ryan's <em>Poetic</em> and Literary Insights</h1>
+  <h1 itemprop="headline">Ryan's <em>Poetic</em> and <span class="title-accent">Literary Insights</span></h1>
   <p itemprop="description">A collection of thoughts, stories, and poetry</p>
 </header>
+
+<!-- ── ABOUT STRIP ── -->
+<section class="about-strip" itemscope itemtype="https://schema.org/Person">
+  <div class="about-inner">
+    <span class="about-ornament">✦ &nbsp; ✦ &nbsp; ✦</span>
+    <h2 class="about-name">
+      <strong itemprop="name">Ryan Bartholomew Okello</strong>
+    </h2>
+    <p class="about-bio" itemprop="description">
+      Poetry, for me, is not performance — it is excavation.<br>
+      A way to sit with a thought long enough to understand it,<br>
+      to reflect on what it means to feel, to fail, to keep going.
+    </p>
+    <span class="about-inspirations">
+      Inspired by Kafka &amp; Nietzsche
+    </span>
+  </div>
+</section>
+
+<div class="ornament-divider"><span>✦</span></div>
 
 <nav class="breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList" aria-label="Breadcrumb">
   <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
@@ -824,7 +1017,7 @@ noscript .post-card { border-left-color: var(--accent); }
 <footer itemscope itemtype="https://schema.org/WPFooter">
   <p>&copy; <span itemprop="copyrightYear">2024</span> <span itemprop="copyrightHolder">Ryan's Poetic and Literary Insights</span></p>
   <p>Crafted with ❤️ and words</p>
-  <p><a href="mailto:ryanlist35@gmail.com" itemprop="email">Contact</a> | <a href="#" onclick="document.getElementById('about-modal').classList.add('active'); return false;">About</a></p>
+  <p><a href="/cdn-cgi/l/email-protection#710308101f1d180205424431161c10181d5f121e1c" itemprop="email">Contact</a> | <a href="#" onclick="document.getElementById('about-modal').classList.add('active'); return false;">About</a></p>
 </footer>
 
 <div id="admin-modal" class="modal">
@@ -844,7 +1037,7 @@ noscript .post-card { border-left-color: var(--accent); }
 
 <button id="add-btn" class="add-post-btn" onclick="openAddPost()" aria-label="Add new post">+</button>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 if ('connection' in navigator) {
   if (navigator.connection.effectiveType === '4g') {
     const link = document.createElement('link');
@@ -1091,6 +1284,7 @@ function displayPosts(){
             const formattedDate=formatDate(post.created_at);
             return `
             <article class="post-card ${escapeHtml(post.type)}" data-post-id="${post.id}" style="cursor:pointer;" itemscope itemtype="https://schema.org/BlogPosting">
+                <span class="post-type-badge">${post.type === 'poem' ? 'Poem' : 'Article'}</span>
                 <h3 itemprop="headline">${escapeHtml(post.title)}</h3>
                 <span class="post-date"><time itemprop="datePublished" datetime="${post.created_at||new Date().toISOString()}">${formattedDate||'Recently'}</time></span>
                 <span class="reading-time" itemprop="timeRequired" content="PT${readTime}M">${readTime} min read</span>
@@ -1114,6 +1308,7 @@ function displayPosts(){
             const formattedDate=formatDate(post.created_at);
             return `
             <a href="${postUrl}" class="post-card ${escapeHtml(post.type)}" itemscope itemtype="https://schema.org/BlogPosting">
+                <span class="post-type-badge">${post.type === 'poem' ? 'Poem' : 'Article'}</span>
                 <h3 itemprop="headline">${escapeHtml(post.title)}</h3>
                 <span class="post-date"><time itemprop="datePublished" datetime="${post.created_at||new Date().toISOString()}">${formattedDate||'Recently'}</time></span>
                 <span class="reading-time" itemprop="timeRequired" content="PT${readTime}M">${readTime} min read</span>
@@ -1324,11 +1519,4 @@ function showMessage(text,type){
     setTimeout(()=>msg.remove(),3000);
 }
 
-document.getElementById("admin-modal").addEventListener("click",function(e){ if(e.target===this)closeModal(); });
-document.addEventListener("keydown",function(e){ if(e.key==="Escape")closeModal(); });
-
-loadTheme();
-initSupabase();
-</script>
-</body>
-</html>
+document.getElementById("admin-modal").addEventListener("click",function(e){ if(e.target===this)closeModal
