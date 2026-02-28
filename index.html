@@ -762,7 +762,6 @@ noscript .post-card { border-left-color: var(--accent); }
   overflow: hidden;
 }
 
-/* Faint Kafka/Nietzsche decorative text behind */
 .about-strip::before {
   content: 'K  N';
   position: absolute;
@@ -793,49 +792,6 @@ noscript .post-card { border-left-color: var(--accent); }
   margin-bottom: 18px;
   display: block;
   opacity: 0.7;
-}
-
-.about-name {
-  font-family: var(--serif);
-  font-size: clamp(1.4rem, 3vw, 2rem);
-  font-weight: 400;
-  font-style: italic;
-  color: var(--parchment);
-  letter-spacing: 0.02em;
-  margin-bottom: 16px;
-  line-height: 1.2;
-}
-
-.about-name strong {
-  font-weight: 700;
-  font-style: normal;
-  color: var(--gold);
-}
-
-.about-bio {
-  font-family: var(--body);
-  font-size: 1.05rem;
-  line-height: 1.85;
-  color: rgba(232,220,200,0.72);
-  font-style: italic;
-  margin-bottom: 22px;
-}
-
-.about-inspirations {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--gold);
-  opacity: 0.65;
-}
-.about-inspirations::before,
-.about-inspirations::after {
-  content: '—';
-  opacity: 0.4;
 }
 
 /* ── SECTION DIVIDER ── */
@@ -955,17 +911,6 @@ header:hover h1 span.title-accent::after {
 <section class="about-strip" itemscope itemtype="https://schema.org/Person">
   <div class="about-inner">
     <span class="about-ornament">✦ &nbsp; ✦ &nbsp; ✦</span>
-    <h2 class="about-name">
-      <strong itemprop="name">Ryan Bartholomew Okello</strong>
-    </h2>
-    <p class="about-bio" itemprop="description">
-      Poetry, for me, is not performance — it is excavation.<br>
-      A way to sit with a thought long enough to understand it,<br>
-      to reflect on what it means to feel, to fail, to keep going.
-    </p>
-    <span class="about-inspirations">
-      Inspired by Kafka &amp; Nietzsche
-    </span>
   </div>
 </section>
 
@@ -1038,22 +983,50 @@ header:hover h1 span.title-accent::after {
 
 <button id="add-btn" class="add-post-btn" onclick="openAddPost()" aria-label="Add new post">+</button>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-if ('connection' in navigator) {
-  if (navigator.connection.effectiveType === '4g') {
-    const link = document.createElement('link');
-    link.rel = 'preconnect';
-    link.href = 'https://cdn.jsdelivr.net';
-    document.head.appendChild(link);
-  }
-}
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async defer></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
 <script>
-const isBot = /bot|crawler|spider|crawling/i.test(navigator.userAgent);
-if (isBot) {
-  console.log('Search engine detected - optimizing render');
+// ── INLINE SUPABASE-COMPATIBLE FETCH CLIENT ──
+// No CDN dependency — uses native fetch for instant loading
+function createClient(url, key) {
+  const baseH = {'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'};
+  class Q {
+    constructor(t){this.t=t;this.p=[];this.rh={...baseH};this.m='GET';this.b=null;this.cnt=false;this.sing=false;this.maybe=false;this._s='*';}
+    select(c,o={}){this._s=c||'*';if(o.count==='exact'){this.cnt=true;this.rh['Prefer']='count=exact';}return this;}
+    eq(c,v){this.p.push(c+'=eq.'+encodeURIComponent(v));return this;}
+    order(c,{ascending:a=true}={}){this.p.push('order='+c+'.'+(a?'asc':'desc'));return this;}
+    single(){this.sing=true;this.rh['Accept']='application/vnd.pgrst.object+json';return this;}
+    maybeSingle(){this.maybe=true;return this;}
+    insert(r){this.m='POST';this.b=JSON.stringify(Array.isArray(r)?r[0]:r);this.rh['Prefer']='return=minimal';return this;}
+    delete(){this.m='DELETE';return this;}
+    update(d){this.m='PATCH';this.b=JSON.stringify(d);this.rh['Prefer']='return=minimal';return this;}
+    then(res){
+      const qs=[...this.p];
+      if(this.m==='GET')qs.unshift('select='+this._s);
+      const fu=url+'/rest/v1/'+this.t+(qs.length?'?'+qs.join('&'):'');
+      const fo={method:this.cnt?'HEAD':this.m,headers:this.rh};
+      if(this.b)fo.body=this.b;
+      fetch(fu,fo).then(async r=>{
+        if(this.cnt){const cr=r.headers.get('Content-Range')||'/0';return res({count:parseInt(cr.split('/').pop())||0,error:null});}
+        if(this.m!=='GET')return res({data:null,error:r.ok?null:new Error(await r.text())});
+        if(!r.ok){if((this.maybe||this.sing)&&r.status===406)return res({data:null,error:null});return res({data:null,error:new Error(await r.text())});}
+        const d=await r.json();
+        if(this.sing)return res({data:d,error:null});
+        if(this.maybe)return res({data:Array.isArray(d)?d[0]??null:d,error:null});
+        return res({data:d,error:null});
+      }).catch(e=>res({data:null,error:e}));
+    }
+  }
+  return {
+    from:t=>new Q(t),
+    auth:{
+      signInWithPassword:async({email:e,password:pw})=>{
+        const r=await fetch(url+'/auth/v1/token?grant_type=password',{method:'POST',headers:baseH,body:JSON.stringify({email:e,password:pw})});
+        const d=await r.json();
+        if(!r.ok)throw{message:d.error_description||d.msg||'Login failed'};
+        return{data:d,error:null};
+      }
+    }
+  };
 }
 
 const SUPABASE_URL="https://zqmgtnnwrceagkshfapq.supabase.co";
@@ -1109,12 +1082,8 @@ function setCachedPosts(posts){
 }
 
 function initSupabase(){
-    if(window.supabase){
-        sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-        loadPosts();
-    }else{
-        setTimeout(initSupabase,100);
-    }
+    sb=createClient(SUPABASE_URL,SUPABASE_KEY);
+    loadPosts();
 }
 
 async function loadPosts(){
@@ -1129,7 +1098,7 @@ async function loadPosts(){
         }
         const{data,error}=await Promise.race([
             sb.from('posts').select('id,title,type,content,created_at').order('created_at',{ascending:false}),
-            new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout')),5000))
+            new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout')),8000))
         ]);
         if(error)throw error;
         allPosts=data||[];
@@ -1520,4 +1489,10 @@ function showMessage(text,type){
     setTimeout(()=>msg.remove(),3000);
 }
 
-document.getElementById("admin-modal").addEventListener("click",function(e){ if(e.target===this)closeModal
+document.getElementById("admin-modal").addEventListener("click",function(e){ if(e.target===this)closeModal(); });
+
+loadTheme();
+initSupabase();
+</script>
+</body>
+</html>
